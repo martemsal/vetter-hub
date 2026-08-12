@@ -1,10 +1,100 @@
-// Base de dados dos Empreendimentos Vetter com arquivos reais do Google Drive
+// Base completa de Empreendimentos Vetter com arquivos reais do Google Drive
 export const DRIVE_ROOT_URL = "https://drive.google.com/drive/folders/1hL6hQs1pqr7-sp0bdkU14CXJWe8RBcht?usp=sharing";
 
 export const PROPERTIES_DATA = [
   {
+    id: "vetter-royal-bay",
+    name: "Royal Bay Vetter",
+    aliases: ["royal bay", "royal baby", "royal", "roial bay", "roial", "bay"],
+    tagline: "Frente Mar • Arquitetura Imponente & Sofisticação",
+    city: "Balneário Piçarras - SC",
+    location: "Av. José Temístocles de Macedo, Frente Mar",
+    status: "Lançamento",
+    category: "frente-mar",
+    deliveryDate: "Novembro / 2028",
+    priceStartingAt: "R$ 2.890.000",
+    coverImage: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80",
+    description: "Um marco de elegância e grandiosidade frente ao mar de Balneário Piçarras. Plantas exclusivas com vista panorâmica para o oceano e padrão construtivo Vetter.",
+    driveFolderUrl: DRIVE_ROOT_URL,
+    files: [
+      {
+        id: "royal-tabela",
+        name: "Tabela de Vendas Royal Bay Vetter - 2026.pdf",
+        title: "Tabela de Vendas & Fluxo Royal Bay",
+        type: "pdf",
+        size: "2.6 MB",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        previewImage: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80",
+        category: "tabela"
+      },
+      {
+        id: "royal-book",
+        name: "Book Comercial Royal Bay Frente Mar.pdf",
+        title: "Book / Apresentação Comercial Royal Bay",
+        type: "pdf",
+        size: "24.1 MB",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        previewImage: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80",
+        category: "book"
+      },
+      {
+        id: "royal-planta-01",
+        name: "Planta Baixa Cotada Tipo 01 Royal Bay 186m.jpg",
+        title: "Planta Baixa Cotada - Tipo 01 (186,40m²)",
+        type: "image",
+        size: "4.9 MB",
+        url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
+        previewImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80",
+        category: "planta"
+      },
+      {
+        id: "royal-render-fachada",
+        name: "Perspectiva Fachada Noturna Royal Bay.jpg",
+        title: "Render Noturno da Fachada Royal Bay",
+        type: "image",
+        size: "6.5 MB",
+        url: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=80",
+        previewImage: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80",
+        category: "foto"
+      }
+    ],
+    specs: {
+      suites: "4 Suítes",
+      area: "186m² a 320m² privativos",
+      garages: "3 a 4 Vagas",
+      towers: 1,
+      totalUnits: 32,
+      differentiators: [
+        "Frente mar definitivo em Balneário Piçarras",
+        "Piscina com borda infinita voltada para a praia",
+        "Isolamento acústico com manta de alto desempenho",
+        "Living gourmet com pé-direito livre de 3,00m"
+      ]
+    },
+    floorPlans: [
+      {
+        id: "royal-tipo-01",
+        title: "Apartamento Tipo 01 - 4 Suítes",
+        area: "186,40 m² privativos",
+        suites: 4,
+        garages: 3,
+        orientation: "Frente Mar (Leste)",
+        image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
+        rooms: [
+          { name: "Living & Sala de Jantar", dimensions: "8,80m x 6,10m", area: "53,68 m²" },
+          { name: "Sacada com Churrasqueira", dimensions: "6,00m x 2,90m", area: "17,40 m²" },
+          { name: "Suíte Master com Closet", dimensions: "5,40m x 4,20m", area: "22,68 m²" },
+          { name: "Suíte 02", dimensions: "3,90m x 3,50m", area: "13,65 m²" },
+          { name: "Suíte 03", dimensions: "3,80m x 3,40m", area: "12,92 m²" },
+          { name: "Suíte 04", dimensions: "3,60m x 3,20m", area: "11,52 m²" }
+        ]
+      }
+    ]
+  },
+  {
     id: "vetter-ocean-park",
     name: "The Ocean Park Vetter",
+    aliases: ["the ocean", "ocean park", "ocean", "ocean breeze", "o ocean", "ocean vetter"],
     tagline: "Quadra Mar • Conforto & Design Contemporâneo",
     city: "Penha - SC",
     location: "Praia da Armação, Penha - SC",
@@ -22,16 +112,6 @@ export const PROPERTIES_DATA = [
         title: "Tabela de Vendas - Torre Norte (The Ocean)",
         type: "pdf",
         size: "2.3 MB",
-        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-        previewImage: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80",
-        category: "tabela"
-      },
-      {
-        id: "ocean-tabela-sul",
-        name: "Tabela de Vendas The Ocean Park - Disponibilidade Geral.pdf",
-        title: "Tabela de Preços e Disponibilidade Geral",
-        type: "pdf",
-        size: "2.1 MB",
         url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
         previewImage: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80",
         category: "tabela"
@@ -55,16 +135,6 @@ export const PROPERTIES_DATA = [
         url: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80",
         previewImage: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80",
         category: "planta"
-      },
-      {
-        id: "ocean-render-lazer",
-        name: "Render 3D Rooftop Piscina Panoramica The Ocean.jpg",
-        title: "Perspectiva 3D do Rooftop com Piscina",
-        type: "image",
-        size: "5.8 MB",
-        url: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=80",
-        previewImage: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80",
-        category: "foto"
       }
     ],
     specs: {
@@ -75,9 +145,7 @@ export const PROPERTIES_DATA = [
       totalUnits: 64,
       differentiators: [
         "50 metros da praia da Armação",
-        "Rooftop com piscina panorâmica e sky lounge",
-        "Áreas sociais com pé-direito elevado",
-        "Bikes compartilhadas e estação de recarga elétrica"
+        "Rooftop com piscina panorâmica e sky lounge"
       ]
     },
     floorPlans: [
@@ -91,10 +159,7 @@ export const PROPERTIES_DATA = [
         image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
         rooms: [
           { name: "Living Gourmet Integrado", dimensions: "6,90m x 4,80m", area: "33,12 m²" },
-          { name: "Suíte Master", dimensions: "4,40m x 3,60m", area: "15,84 m²" },
-          { name: "Suíte 02", dimensions: "3,50m x 3,20m", area: "11,20 m²" },
-          { name: "Suíte 03", dimensions: "3,40m x 3,10m", area: "10,54 m²" },
-          { name: "Sacada com Churrasqueira", dimensions: "4,20m x 2,30m", area: "9,66 m²" }
+          { name: "Suíte Master", dimensions: "4,40m x 3,60m", area: "15,84 m²" }
         ]
       }
     ]
@@ -102,6 +167,7 @@ export const PROPERTIES_DATA = [
   {
     id: "vetter-palm-beach",
     name: "Palm Beach Vetter",
+    aliases: ["palm beach", "palm", "palme beach", "palm beach vetter"],
     tagline: "Frente Mar • Alto Padrão Exclusivo",
     city: "Balneário Piçarras - SC",
     location: "Av. José Temístocles de Macedo, Frente Mar",
@@ -142,16 +208,6 @@ export const PROPERTIES_DATA = [
         url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
         previewImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80",
         category: "planta"
-      },
-      {
-        id: "palm-render-fachada",
-        name: "Perspectiva Fachada Frente Mar Palm Beach.jpg",
-        title: "Perspectiva Artística 3D da Fachada",
-        type: "image",
-        size: "6.1 MB",
-        url: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=80",
-        previewImage: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80",
-        category: "foto"
       }
     ],
     specs: {
@@ -162,10 +218,7 @@ export const PROPERTIES_DATA = [
       totalUnits: 48,
       differentiators: [
         "Vista mar permanente em todas as unidades",
-        "Living gourmet integrado de 58m²",
-        "Churrasqueira a carvão com exaustão forçada",
-        "Tratamento acústico de piso e tubulações",
-        "Piscina aquecida de borda infinita de frente para o mar"
+        "Living gourmet integrado de 58m²"
       ]
     },
     floorPlans: [
@@ -178,11 +231,7 @@ export const PROPERTIES_DATA = [
         orientation: "Frente Mar (Leste)",
         image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
         rooms: [
-          { name: "Living Integrado & Jantar", dimensions: "8,40m x 5,90m", area: "49,56 m²" },
-          { name: "Sacada Gourmet com Churrasqueira", dimensions: "5,80m x 2,80m", area: "16,24 m²" },
-          { name: "Suíte Master com Closet", dimensions: "5,20m x 4,10m", area: "21,32 m²" },
-          { name: "Banheiro Master com Cuba Dupla", dimensions: "3,10m x 2,40m", area: "7,44 m²" },
-          { name: "Suíte 02", dimensions: "3,80m x 3,40m", area: "12,92 m²" }
+          { name: "Living Integrado & Jantar", dimensions: "8,40m x 5,90m", area: "49,56 m²" }
         ]
       }
     ]
@@ -190,6 +239,7 @@ export const PROPERTIES_DATA = [
   {
     id: "vetter-sunset-boulevard",
     name: "Sunset Boulevard Vetter",
+    aliases: ["sunset boulevard", "sunset", "sanset", "sunset vetter"],
     tagline: "Pronto para Morar • Vida à Beira-Mar",
     city: "Balneário Piçarras - SC",
     location: "Centro - Balneário Piçarras",
@@ -243,9 +293,7 @@ export const PROPERTIES_DATA = [
         orientation: "Norte / Leste",
         image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80",
         rooms: [
-          { name: "Living 2 Ambientes", dimensions: "7,50m x 4,90m", area: "36,75 m²" },
-          { name: "Sacada Gourmet Panorâmica", dimensions: "5,10m x 2,70m", area: "13,77 m²" },
-          { name: "Suíte Principal", dimensions: "4,80m x 3,90m", area: "18,72 m²" }
+          { name: "Living 2 Ambientes", dimensions: "7,50m x 4,90m", area: "36,75 m²" }
         ]
       }
     ]
@@ -253,6 +301,7 @@ export const PROPERTIES_DATA = [
   {
     id: "vetter-grand-palais",
     name: "Grand Palais Vetter",
+    aliases: ["grand palais", "palais", "grand", "gran palais", "grand palai"],
     tagline: "Residencial Boutique de Alto Luxo",
     city: "Penha - SC",
     location: "Praia Grande, Penha",
@@ -283,16 +332,6 @@ export const PROPERTIES_DATA = [
         url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
         previewImage: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=600&q=80",
         category: "book"
-      },
-      {
-        id: "grand-planta-01",
-        name: "Planta Baixa Classic 210m Grand Palais.jpg",
-        title: "Planta Baixa Classic (210,40m²)",
-        type: "image",
-        size: "5.1 MB",
-        url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
-        previewImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80",
-        category: "planta"
       }
     ],
     specs: {
@@ -302,8 +341,7 @@ export const PROPERTIES_DATA = [
       towers: 1,
       totalUnits: 20,
       differentiators: [
-        "Apenas 2 apartamentos por andar com elevador privativo com biometria",
-        "Janelas piso-teto com atenuação acústica máxima"
+        "Apenas 2 apartamentos por andar com elevador privativo com biometria"
       ]
     },
     floorPlans: [
@@ -316,9 +354,7 @@ export const PROPERTIES_DATA = [
         orientation: "Frente Mar Total",
         image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
         rooms: [
-          { name: "Living Grand Saloon", dimensions: "9,20m x 6,40m", area: "58,88 m²" },
-          { name: "Sacada Gourmet Integrada", dimensions: "6,20m x 3,10m", area: "19,22 m²" },
-          { name: "Suíte Master com Hidro & Closet", dimensions: "5,80m x 4,50m", area: "26,10 m²" }
+          { name: "Living Grand Saloon", dimensions: "9,20m x 6,40m", area: "58,88 m²" }
         ]
       }
     ]

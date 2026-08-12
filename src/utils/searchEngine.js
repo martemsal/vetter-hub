@@ -1,10 +1,10 @@
-// Motor de Busca Semântica Estrita - Retorna Exclusivamente o Arquivo Solicitado
+// Motor de Busca Semântica Estrita e Reconhecimento Fonético de Empreendimentos Vetter
 
 const CATEGORY_SYNONYMS = {
   tabela: [
     'tabela', 'tabelas', 'preço', 'preco', 'preços', 'precos', 'valor', 'valores', 
     'custo', 'pagamento', 'condições', 'condicoes', 'fluxo', 'disponibilidade', 
-    'vendas', 'venda', 'espelho', 'saldo', 'parcelas'
+    'vendas', 'venda', 'espelho', 'saldo', 'parcelas', 'presente a tabela'
   ],
   planta: [
     'planta', 'plantas', 'planta baixa', 'cota', 'cotas', 'dimensão', 'dimensao', 
@@ -18,11 +18,10 @@ const CATEGORY_SYNONYMS = {
   ],
   foto: [
     'foto', 'fotos', 'render', 'renders', 'imagem', 'imagens', 'perspectiva', 
-    'perspectivas', '3d', 'fachada', 'obra', 'obras', 'lazer', 'piscina', 
-    'living', 'decorado', 'vista'
+    'perspectivas', '3d', 'fachada', 'obra', 'obras', 'lazer', 'piscina', 'living'
   ],
   video: [
-    'video', 'vídeo', 'videos', 'vídeos', 'tour', 'virtual', 'drone', 'teaser', 'filmagem'
+    'video', 'vídeo', 'videos', 'vídeos', 'tour', 'virtual', 'drone', 'teaser'
   ]
 };
 
@@ -41,7 +40,8 @@ const STOPWORDS = new Set([
   'o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da', 'dos', 'das',
   'em', 'no', 'na', 'nos', 'nas', 'por', 'para', 'pra', 'com', 'sem', 'que', 'e',
   'me', 'eu', 'voce', 'quero', 'gostaria', 'trazer', 'traga', 'buscar', 'ache',
-  'encontre', 'mande', 'envie', 'favor', 'porfavor', 'the', 'somente', 'apenas', 'so'
+  'encontre', 'mande', 'envie', 'favor', 'porfavor', 'the', 'somente', 'apenas', 'so',
+  'presente', 'mostre', 'exiba', 'baixe'
 ]);
 
 export function extractKeywords(query) {
@@ -71,12 +71,12 @@ function calculateTextOverlap(queryTokens, targetText) {
 
   for (const token of queryTokens) {
     if (normTarget.includes(token)) {
-      score += 3.0;
+      score += 4.0;
     } else {
       for (const targetWord of normTarget.split(' ')) {
         if (targetWord.includes(token) || token.includes(targetWord)) {
           if (Math.min(token.length, targetWord.length) >= 3) {
-            score += 1.5;
+            score += 2.0;
           }
         }
       }
@@ -87,63 +87,102 @@ function calculateTextOverlap(queryTokens, targetText) {
 }
 
 /**
- * Busca estrita: Retorna unicamente o arquivo exato mais relevante para não criar confusão
+ * Busca estrita por empreendimento + arquivo
  */
 export function findMatchingFiles(userQuery, propertiesData) {
   if (!userQuery || !propertiesData || propertiesData.length === 0) {
     return { matchedFiles: [], matchedProperty: null, confidenceScore: 0 };
   }
 
+  const normQuery = normalizeText(userQuery);
   const queryTokens = extractKeywords(userQuery);
   const categoriesIntent = detectCategoryIntent(userQuery);
 
+  let bestProperty = null;
+  let highestPropScore = 0;
+
+  // 1. Identificar com precisão o empreendimento
+  propertiesData.forEach((property) => {
+    let propScore = calculateTextOverlap(queryTokens, property.name) * 3.0;
+
+    // Verificar aliases fonéticos (ex: "royal baby" -> "Royal Bay Vetter")
+    if (property.aliases) {
+      for (const alias of property.aliases) {
+        if (normQuery.includes(normalizeText(alias))) {
+          propScore += 15.0; // Forte correspondência de alias
+          break;
+        }
+      }
+    }
+
+    if (propScore > highestPropScore) {
+      highestPropScore = propScore;
+      bestProperty = property;
+    }
+  });
+
+  // Se nenhum empreendimento teve score mínimo, não força um errado
+  if (!bestProperty || highestPropScore < 2.0) {
+    // Tenta encontrar por nome de arquivo direto em toda a base
+    let candidateFiles = [];
+    propertiesData.forEach(p => {
+      p.files?.forEach(f => {
+        const fileScore = calculateTextOverlap(queryTokens, f.name) + calculateTextOverlap(queryTokens, f.title);
+        if (fileScore > 2.0) {
+          candidateFiles.push({ file: { ...f, propertyName: p.name }, score: fileScore, property: p });
+        }
+      });
+    });
+
+    if (candidateFiles.length > 0) {
+      candidateFiles.sort((a, b) => b.score - a.score);
+      return {
+        matchedFiles: [candidateFiles[0].file],
+        matchedProperty: candidateFiles[0].property,
+        confidenceScore: candidateFiles[0].score
+      };
+    }
+
+    return { matchedFiles: [], matchedProperty: null, confidenceScore: 0 };
+  }
+
+  // 2. Com o empreendimento identificado, buscar o arquivo específico dentro dele
+  const files = bestProperty.files || [];
   let scoredFiles = [];
 
-  propertiesData.forEach((property) => {
-    const propNameScore = calculateTextOverlap(queryTokens, property.name) * 3.0 +
-      calculateTextOverlap(queryTokens, property.tagline || '') * 1.0;
+  files.forEach((file) => {
+    let fileScore = 1.0;
 
-    const allFiles = property.files || [];
+    // Bônus pela categoria exata solicitada (tabela, planta, book, foto)
+    if (categoriesIntent && categoriesIntent.includes(file.category)) {
+      fileScore += 10.0;
+    }
 
-    allFiles.forEach((file) => {
-      let fileScore = propNameScore;
+    // Score por palavras do título/nome
+    fileScore += calculateTextOverlap(queryTokens, file.title) * 3.0;
+    fileScore += calculateTextOverlap(queryTokens, file.name) * 3.0;
 
-      // Score do título e nome do arquivo
-      const titleScore = calculateTextOverlap(queryTokens, file.title || '') * 4.0;
-      const fileNameScore = calculateTextOverlap(queryTokens, file.name || '') * 4.0;
-      fileScore += titleScore + fileNameScore;
-
-      // Bônus forte pela categoria exata solicitada (tabela, planta, book, foto)
-      if (categoriesIntent && categoriesIntent.includes(file.category)) {
-        fileScore += 8.0;
-      }
-
-      if (fileScore > 0) {
-        scoredFiles.push({
-          file: {
-            ...file,
-            propertyName: property.name,
-            propertyCity: property.city
-          },
-          property,
-          score: fileScore
-        });
-      }
+    scoredFiles.push({
+      file: {
+        ...file,
+        propertyName: bestProperty.name,
+        propertyCity: bestProperty.city
+      },
+      property: bestProperty,
+      score: fileScore
     });
   });
 
   scoredFiles.sort((a, b) => b.score - a.score);
 
   if (scoredFiles.length === 0) {
-    return { matchedFiles: [], matchedProperty: null, confidenceScore: 0 };
+    return { matchedFiles: [], matchedProperty: bestProperty, confidenceScore: 0 };
   }
 
-  // RETORNA RIGOROSAMENTE APENAS 1 ARQUIVO (O MAIS RELEVANTE)
-  const exactFile = [scoredFiles[0].file];
-
+  // Retorna rigorosamente APENAS O ARQUIVO SOLICITADO
   return {
-    matchedFiles: exactFile,
-    matchedProperty: scoredFiles[0].property,
+    matchedFiles: [scoredFiles[0].file],
+    matchedProperty: bestProperty,
     confidenceScore: scoredFiles[0].score
   };
 }

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Send, Sparkles, Bot, HardDrive, 
+  Send, Sparkles, Bot, 
   Mic, MicOff, Volume2, VolumeX, Download, Eye, 
   Share2, FileText, Image, FileSpreadsheet, X, CheckCircle, Search 
 } from 'lucide-react';
@@ -12,7 +12,7 @@ export default function AssistantChat() {
     {
       id: 1,
       sender: 'assistant',
-      text: 'Olá! Fale ou digite o arquivo que você precisa (ex: *"quero a tabela do The Ocean"*).\nEu localizo nas pastas e trago **exclusivamente o arquivo solicitado** na tela para você baixar.',
+      text: 'Olá! Dite ou digite o arquivo que você procura (ex: *"tabela do Royal Bay"* ou *"tabela do The Ocean"*).\nEu localizo nas pastas do Google Drive e trago **somente o arquivo solicitado** para você baixar.',
       files: []
     }
   ]);
@@ -170,9 +170,9 @@ export default function AssistantChat() {
 
       if (matchedFiles && matchedFiles.length > 0) {
         const file = matchedFiles[0];
-        replyText = `Aqui está o arquivo solicitado:`;
+        replyText = `Arquivo localizado: **${file.propertyName}**`;
       } else {
-        replyText = `Nenhum arquivo correspondente foi encontrado para a sua solicitação.`;
+        replyText = `Não localizei nenhum arquivo correspondente a "${query}". Verifique o nome do empreendimento (ex: Royal Bay, Palm Beach, The Ocean).`;
       }
 
       const newMsgId = Date.now() + 1;
@@ -186,9 +186,9 @@ export default function AssistantChat() {
       setMessages((prev) => [...prev, assistantMsg]);
 
       if (wasVoice && matchedFiles && matchedFiles.length > 0) {
-        speakText(`Aqui está o arquivo ${matchedFiles[0].title}`, newMsgId);
+        speakText(`Aqui está a ${matchedFiles[0].title}`, newMsgId);
       }
-    }, 450);
+    }, 350);
   };
 
   const getFileIcon = (file) => {
@@ -245,8 +245,8 @@ export default function AssistantChat() {
         </div>
       )}
 
-      {/* Lista de Mensagens */}
-      <div className="chat-messages-area">
+      {/* Lista de Mensagens com espaçamento adequado */}
+      <div className="chat-messages-area" style={{ paddingBottom: 16 }}>
         {messages.map((msg) => (
           <div key={msg.id} className={`chat-bubble ${msg.sender}`}>
             {msg.sender === 'assistant' && (
@@ -334,9 +334,9 @@ export default function AssistantChat() {
       {/* Sugestões Rápidas */}
       <div className="chat-suggestions-row">
         {[
-          'Quero a tabela do The Ocean',
-          'Tabela do Palm Beach',
-          'Planta do Ocean',
+          'Tabela do Royal Bay',
+          'Tabela do The Ocean',
+          'Planta do Palm Beach',
           'Book do Grand Palais'
         ].map((prompt, idx) => (
           <button
@@ -362,7 +362,7 @@ export default function AssistantChat() {
 
         <input
           type="text"
-          placeholder={isRecording ? "Ouvindo sua voz... (envia ao parar)" : "Ex: quero a tabela do The Ocean..."}
+          placeholder={isRecording ? "Ouvindo sua voz... (envia ao parar)" : "Ex: tabela do Royal Bay..."}
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={(e) => {
