@@ -2,17 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Send, Sparkles, Bot, 
   Mic, MicOff, Volume2, VolumeX, Download, Eye, 
-  Share2, FileText, Image, FileSpreadsheet, X, CheckCircle, Search 
+  Share2, FileText, Image, FileSpreadsheet, X, CheckCircle, Search, AlertCircle 
 } from 'lucide-react';
-import { PROPERTIES_DATA } from '../data/properties';
-import { findMatchingFiles } from '../utils/searchEngine';
+import { getStoredDriveIndex } from '../data/driveIndex';
+import { searchDriveWithGeminiIntelligence } from '../utils/geminiDriveEngine';
 
 export default function AssistantChat() {
+  const [driveFiles, setDriveFiles] = useState(() => getStoredDriveIndex());
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: 'assistant',
-      text: 'Olá! Dite ou digite o arquivo que você procura (ex: *"tabela do Royal Bay"* ou *"tabela do The Ocean"*).\nEu localizo nas pastas do Google Drive e trago **somente o arquivo solicitado** para você baixar.',
+      text: 'Olá! Estou conectado às pastas do **Google Drive** com inteligência de busca precisa.\n\n🎙️ Fale por voz ou digite o arquivo que você quer (ex: *"Tabela do Bal Harbour"* ou *"Planta do Royal Bay"*).\n\nEu localizo e trago **somente o arquivo exato solicitado** para você baixar na hora.',
       files: []
     }
   ]);
@@ -163,30 +164,34 @@ export default function AssistantChat() {
     setIsProcessingVoice(false);
 
     setTimeout(() => {
-      const searchResult = findMatchingFiles(query, PROPERTIES_DATA);
-      const { matchedFiles, matchedProperty } = searchResult;
-
-      let replyText = '';
-
-      if (matchedFiles && matchedFiles.length > 0) {
-        const file = matchedFiles[0];
-        replyText = `Arquivo localizado: **${file.propertyName}**`;
-      } else {
-        replyText = `Não localizei nenhum arquivo correspondente a "${query}". Verifique o nome do empreendimento (ex: Royal Bay, Palm Beach, The Ocean).`;
-      }
-
+      // Motor de Busca Inteligente estilo Gemini Drive
+      const searchResult = searchDriveWithGeminiIntelligence(query, driveFiles);
       const newMsgId = Date.now() + 1;
-      const assistantMsg = {
-        id: newMsgId,
-        sender: 'assistant',
-        text: replyText,
-        files: matchedFiles
-      };
 
-      setMessages((prev) => [...prev, assistantMsg]);
+      if (searchResult.status === 'found' && searchResult.file) {
+        const assistantMsg = {
+          id: newMsgId,
+          sender: 'assistant',
+          text: `Arquivo localizado no Google Drive: **${searchResult.file.propertyName}**`,
+          files: [searchResult.file]
+        };
+        setMessages((prev) => [...prev, assistantMsg]);
 
-      if (wasVoice && matchedFiles && matchedFiles.length > 0) {
-        speakText(`Aqui está a ${matchedFiles[0].title}`, newMsgId);
+        if (wasVoice) {
+          speakText(`Aqui está a ${searchResult.file.title}`, newMsgId);
+        }
+      } else {
+        const assistantMsg = {
+          id: newMsgId,
+          sender: 'assistant',
+          text: searchResult.message,
+          files: []
+        };
+        setMessages((prev) => [...prev, assistantMsg]);
+
+        if (wasVoice) {
+          speakText(`Não encontrei este arquivo no Google Drive.`, newMsgId);
+        }
       }
     }, 350);
   };
@@ -208,10 +213,10 @@ export default function AssistantChat() {
             <Sparkles size={16} />
           </div>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700 }}>Assistente de Entrega Direta</div>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>Busca de Arquivos Google Drive</div>
             <div style={{ fontSize: 11, color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: 4 }}>
               <CheckCircle size={12} />
-              <span>Entrega Exclusiva do Arquivo Solicitado</span>
+              <span>{driveFiles.length} arquivos indexados nas pastas</span>
             </div>
           </div>
         </div>
@@ -241,18 +246,18 @@ export default function AssistantChat() {
       {isProcessingVoice && (
         <div className="voice-status-banner" style={{ background: 'rgba(230, 195, 92, 0.15)', borderColor: 'var(--gold-primary)', color: 'var(--gold-primary)' }}>
           <Search size={14} />
-          <span>Localizando o arquivo no Google Drive...</span>
+          <span>Buscando arquivo nas pastas do Google Drive...</span>
         </div>
       )}
 
-      {/* Lista de Mensagens com espaçamento adequado */}
+      {/* Lista de Mensagens */}
       <div className="chat-messages-area" style={{ paddingBottom: 16 }}>
         {messages.map((msg) => (
           <div key={msg.id} className={`chat-bubble ${msg.sender}`}>
             {msg.sender === 'assistant' && (
               <div className="assistant-avatar-row">
                 <Bot size={14} color="var(--gold-primary)" />
-                <span className="assistant-badge-name">Vetter Arquivos</span>
+                <span className="assistant-badge-name">Vetter Drive Search</span>
               </div>
             )}
             
@@ -262,9 +267,9 @@ export default function AssistantChat() {
               ))}
             </div>
 
-            {/* Renderiza SOMENTE O ARQUIVO SOLICITADO */}
+            {/* Renderiza SOMENTE O ARQUIVO EXATO SOLICITADO */}
             {msg.files && msg.files.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
                 {msg.files.map((file) => (
                   <div key={file.id} className="chat-file-card">
                     <div className="file-header-row">
@@ -273,7 +278,7 @@ export default function AssistantChat() {
                       </div>
                       <div className="file-info-col">
                         <div className="file-display-name" title={file.name}>{file.title}</div>
-                        <div style={{ fontSize: 11, color: 'var(--gold-primary)', fontFamily: 'monospace', marginTop: 1 }}>
+                        <div style={{ fontSize: 11, color: 'var(--gold-primary)', fontFamily: 'monospace', marginTop: 2 }}>
                           📄 {file.name}
                         </div>
                         <div className="file-meta-row">
@@ -281,19 +286,10 @@ export default function AssistantChat() {
                           <span>•</span>
                           <span>{file.size}</span>
                           <span>•</span>
-                          <span style={{ color: 'var(--accent-emerald)' }}>Google Drive Oficial</span>
+                          <span style={{ color: 'var(--accent-emerald)' }}>{file.folder}</span>
                         </div>
                       </div>
                     </div>
-
-                    {file.previewImage && (
-                      <div className="file-preview-image-box" onClick={() => setPreviewFile(file)} style={{ cursor: 'pointer' }}>
-                        <img src={file.previewImage} alt={file.title} />
-                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s ease' }} onMouseEnter={(e) => e.currentTarget.style.opacity = 1} onMouseLeave={(e) => e.currentTarget.style.opacity = 0}>
-                          <span className="gold-badge"><Eye size={12} /> Ver Prévia</span>
-                        </div>
-                      </div>
-                    )}
 
                     <div className="file-actions-row">
                       <button 
@@ -334,10 +330,10 @@ export default function AssistantChat() {
       {/* Sugestões Rápidas */}
       <div className="chat-suggestions-row">
         {[
+          'Tabela do Bal Harbour',
           'Tabela do Royal Bay',
           'Tabela do The Ocean',
-          'Planta do Palm Beach',
-          'Book do Grand Palais'
+          'Planta do Palm Beach'
         ].map((prompt, idx) => (
           <button
             key={idx}
@@ -362,7 +358,7 @@ export default function AssistantChat() {
 
         <input
           type="text"
-          placeholder={isRecording ? "Ouvindo sua voz... (envia ao parar)" : "Ex: tabela do Royal Bay..."}
+          placeholder={isRecording ? "Ouvindo sua voz... (envia ao parar)" : "Ex: tabela do bal harbour..."}
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={(e) => {
@@ -401,7 +397,7 @@ export default function AssistantChat() {
             <div style={{ padding: 16, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ width: '100%', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#020617', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
                 <img 
-                  src={previewFile.url} 
+                  src={previewFile.previewImage || previewFile.url} 
                   alt={previewFile.title} 
                   style={{ width: '100%', maxHeight: '60vh', objectFit: 'contain', display: 'block' }} 
                 />
