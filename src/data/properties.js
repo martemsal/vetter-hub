@@ -1,4 +1,4 @@
-// Base de dados dos Empreendimentos Vetter com links do Google Drive e materiais
+// Base de dados dos Empreendimentos Vetter com arquivos diretos para download e visualização
 export const DRIVE_ROOT_URL = "https://drive.google.com/drive/folders/1hL6hQs1pqr7-sp0bdkU14CXJWe8RBcht?usp=sharing";
 
 export const PROPERTIES_DATA = [
@@ -15,13 +15,58 @@ export const PROPERTIES_DATA = [
     coverImage: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80",
     description: "Um ícone arquitetônico com vista panorâmica definitiva para o mar, acabamento artesanal Vetter, amplas sacadas com churrasqueira a carvão e área de lazer estilo resort internacional.",
     driveFolderUrl: DRIVE_ROOT_URL,
-    materials: {
-      tablePdfUrl: DRIVE_ROOT_URL,
-      bookPdfUrl: DRIVE_ROOT_URL,
-      videoTourUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      photosCount: 24,
-      floorPlansCount: 4
-    },
+    files: [
+      {
+        id: "palm-tabela",
+        name: "Tabela_Vendas_Palm_Beach_Vetter_Atualizada.pdf",
+        title: "Tabela de Vendas & Condições de Pagamento",
+        type: "pdf",
+        size: "2.4 MB",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        previewImage: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80",
+        category: "tabela"
+      },
+      {
+        id: "palm-book",
+        name: "Book_Apresentacao_Comercial_Palm_Beach.pdf",
+        title: "Book / Apresentação Comercial de Luxo",
+        type: "pdf",
+        size: "18.6 MB",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        previewImage: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80",
+        category: "book"
+      },
+      {
+        id: "palm-planta-01",
+        name: "Planta_Baixa_Cotada_Tipo_01_178m_Palm_Beach.jpg",
+        title: "Planta Arquitetônica Cotada - Tipo 01 (178,50m²)",
+        type: "image",
+        size: "4.8 MB",
+        url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
+        previewImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80",
+        category: "planta"
+      },
+      {
+        id: "palm-planta-02",
+        name: "Planta_Baixa_Cotada_Tipo_02_142m_Palm_Beach.jpg",
+        title: "Planta Arquitetônica Cotada - Tipo 02 (142,80m²)",
+        type: "image",
+        size: "4.2 MB",
+        url: "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=80",
+        previewImage: "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=600&q=80",
+        category: "planta"
+      },
+      {
+        id: "palm-render-fachada",
+        name: "Render_Fachada_Frente_Mar_Palm_Beach.jpg",
+        title: "Perspectiva Artística 3D da Fachada",
+        type: "image",
+        size: "6.1 MB",
+        url: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=80",
+        previewImage: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80",
+        category: "foto"
+      }
+    ],
     specs: {
       suites: "3 a 4 Suítes",
       area: "142m² a 285m² privativos",
@@ -57,23 +102,6 @@ export const PROPERTIES_DATA = [
           { name: "Cozinha & Área de Serviço", dimensions: "4,60m x 2,90m", area: "13,34 m²" },
           { name: "Lavabo Social", dimensions: "1,80m x 1,40m", area: "2,52 m²" }
         ]
-      },
-      {
-        id: "palm-tipo-02",
-        title: "Apartamento Tipo 02",
-        area: "142,80 m² privativos",
-        suites: 3,
-        garages: 2,
-        orientation: "Frente Mar Lateral (Nordeste)",
-        image: "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=80",
-        rooms: [
-          { name: "Living & Jantar", dimensions: "7,20m x 5,10m", area: "36,72 m²" },
-          { name: "Sacada Gourmet", dimensions: "4,90m x 2,60m", area: "12,74 m²" },
-          { name: "Suíte Master", dimensions: "4,60m x 3,80m", area: "17,48 m²" },
-          { name: "Suíte 02", dimensions: "3,60m x 3,30m", area: "11,88 m²" },
-          { name: "Suíte 03", dimensions: "3,50m x 3,20m", area: "11,20 m²" },
-          { name: "Cozinha Integrada", dimensions: "3,80m x 2,60m", area: "9,88 m²" }
-        ]
       }
     ]
   },
@@ -90,13 +118,38 @@ export const PROPERTIES_DATA = [
     coverImage: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80",
     description: "Conexão direta com a natureza exuberante de Penha e as praias mais desejadas do litoral catarinense, a passos do mar e perto de tudo.",
     driveFolderUrl: DRIVE_ROOT_URL,
-    materials: {
-      tablePdfUrl: DRIVE_ROOT_URL,
-      bookPdfUrl: DRIVE_ROOT_URL,
-      videoTourUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      photosCount: 32,
-      floorPlansCount: 3
-    },
+    files: [
+      {
+        id: "ocean-tabela",
+        name: "Tabela_Vendas_Ocean_Breeze_Vetter.pdf",
+        title: "Tabela de Preços e Disponibilidade",
+        type: "pdf",
+        size: "2.1 MB",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        previewImage: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80",
+        category: "tabela"
+      },
+      {
+        id: "ocean-book",
+        name: "Book_Apresentacao_Ocean_Breeze.pdf",
+        title: "Apresentação Comercial Ocean Breeze",
+        type: "pdf",
+        size: "14.2 MB",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        previewImage: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80",
+        category: "book"
+      },
+      {
+        id: "ocean-planta-01",
+        name: "Planta_Baixa_135m_Ocean_Breeze.jpg",
+        title: "Planta Humanizada Tipo 01 (135,20m²)",
+        type: "image",
+        size: "3.9 MB",
+        url: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80",
+        previewImage: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80",
+        category: "planta"
+      }
+    ],
     specs: {
       suites: "3 Suítes",
       area: "126m² a 158m² privativos",
@@ -107,8 +160,7 @@ export const PROPERTIES_DATA = [
         "50 metros da praia da Armação",
         "Rooftop com piscina panorâmica e sky lounge",
         "Áreas sociais com pé-direito elevado",
-        "Bikes compartilhadas e estação de recarga elétrica",
-        "Espaço Pet Place e Beach Care no térreo"
+        "Bikes compartilhadas e estação de recarga elétrica"
       ]
     },
     floorPlans: [
@@ -143,13 +195,28 @@ export const PROPERTIES_DATA = [
     coverImage: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80",
     description: "Obra de arte pronta para morar com o inconfundível padrão de entrega Vetter. Lazer completíssimo com mais de 1.800m² de entretenimento privativo.",
     driveFolderUrl: DRIVE_ROOT_URL,
-    materials: {
-      tablePdfUrl: DRIVE_ROOT_URL,
-      bookPdfUrl: DRIVE_ROOT_URL,
-      videoTourUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      photosCount: 45,
-      floorPlansCount: 2
-    },
+    files: [
+      {
+        id: "sunset-tabela",
+        name: "Tabela_Vendas_Sunset_Boulevard.pdf",
+        title: "Tabela de Unidades Prontas & Financiamento",
+        type: "pdf",
+        size: "1.9 MB",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        previewImage: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80",
+        category: "tabela"
+      },
+      {
+        id: "sunset-planta-01",
+        name: "Planta_Baixa_148m_Sunset_Boulevard.jpg",
+        title: "Planta Baixa Final Tipo 01 (148,00m²)",
+        type: "image",
+        size: "3.7 MB",
+        url: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=80",
+        previewImage: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=600&q=80",
+        category: "planta"
+      }
+    ],
     specs: {
       suites: "3 a 4 Suítes",
       area: "138m² a 240m² privativos",
@@ -158,9 +225,7 @@ export const PROPERTIES_DATA = [
       totalUnits: 36,
       differentiators: [
         "Empreendimento 100% pronto e entregue",
-        "Cinema privativo Vetter, Wine Bar e Pub Inglês",
-        "Spa com sauna seca e úmida + jacuzzi aquecida",
-        "Quadra de Beach Tennis privativa no condomínio"
+        "Cinema privativo Vetter, Wine Bar e Pub Inglês"
       ]
     },
     floorPlans: [
@@ -175,9 +240,7 @@ export const PROPERTIES_DATA = [
         rooms: [
           { name: "Living 2 Ambientes", dimensions: "7,50m x 4,90m", area: "36,75 m²" },
           { name: "Sacada Gourmet Panorâmica", dimensions: "5,10m x 2,70m", area: "13,77 m²" },
-          { name: "Suíte Principal", dimensions: "4,80m x 3,90m", area: "18,72 m²" },
-          { name: "Suíte 02", dimensions: "3,60m x 3,40m", area: "12,24 m²" },
-          { name: "Suíte 03", dimensions: "3,50m x 3,30m", area: "11,55 m²" }
+          { name: "Suíte Principal", dimensions: "4,80m x 3,90m", area: "18,72 m²" }
         ]
       }
     ]
@@ -195,13 +258,38 @@ export const PROPERTIES_DATA = [
     coverImage: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=80",
     description: "Arquitetura neoclássica refinada combinada com alta tecnologia sustentável e tecnologia acústica suíça. O ápice do luxo no litoral de Santa Catarina.",
     driveFolderUrl: DRIVE_ROOT_URL,
-    materials: {
-      tablePdfUrl: DRIVE_ROOT_URL,
-      bookPdfUrl: DRIVE_ROOT_URL,
-      videoTourUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      photosCount: 28,
-      floorPlansCount: 3
-    },
+    files: [
+      {
+        id: "grand-tabela",
+        name: "Tabela_Vendas_Grand_Palais_Vetter.pdf",
+        title: "Tabela de Vendas & Fluxo Direto",
+        type: "pdf",
+        size: "2.8 MB",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        previewImage: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80",
+        category: "tabela"
+      },
+      {
+        id: "grand-book",
+        name: "Book_Apresentacao_Grand_Palais.pdf",
+        title: "Book Executivo de Alto Luxo",
+        type: "pdf",
+        size: "22.4 MB",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        previewImage: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=600&q=80",
+        category: "book"
+      },
+      {
+        id: "grand-planta-01",
+        name: "Planta_Baixa_210m_Grand_Palais.jpg",
+        title: "Planta Baixa Classic (210,40m²)",
+        type: "image",
+        size: "5.1 MB",
+        url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
+        previewImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80",
+        category: "planta"
+      }
+    ],
     specs: {
       suites: "4 Suítes Plenas",
       area: "195m² a 340m² privativos",
@@ -210,9 +298,7 @@ export const PROPERTIES_DATA = [
       totalUnits: 20,
       differentiators: [
         "Apenas 2 apartamentos por andar com elevador privativo com biometria",
-        "Janelas piso-teto com atenuação acústica máxima",
-        "Manta acústica entre lajes de 10mm",
-        "Infraestrutura para automação total e piso aquecido nos banheiros"
+        "Janelas piso-teto com atenuação acústica máxima"
       ]
     },
     floorPlans: [
@@ -227,17 +313,13 @@ export const PROPERTIES_DATA = [
         rooms: [
           { name: "Living Grand Saloon", dimensions: "9,20m x 6,40m", area: "58,88 m²" },
           { name: "Sacada Gourmet Integrada", dimensions: "6,20m x 3,10m", area: "19,22 m²" },
-          { name: "Suíte Master com Hidro & Closet", dimensions: "5,80m x 4,50m", area: "26,10 m²" },
-          { name: "Suíte 02", dimensions: "4,00m x 3,60m", area: "14,40 m²" },
-          { name: "Suíte 03", dimensions: "3,90m x 3,50m", area: "13,65 m²" },
-          { name: "Suíte 04", dimensions: "3,80m x 3,40m", area: "12,92 m²" }
+          { name: "Suíte Master com Hidro & Closet", dimensions: "5,80m x 4,50m", area: "26,10 m²" }
         ]
       }
     ]
   }
 ];
 
-// Atalhos rápidos para pastas e documentos mais consultados no Drive
 export const QUICK_DRIVE_SHORTCUTS = [
   {
     title: "Pasta Raiz • Todos os Empreendimentos",
@@ -266,12 +348,5 @@ export const QUICK_DRIVE_SHORTCUTS = [
     category: "Books",
     url: DRIVE_ROOT_URL,
     icon: "BookOpen"
-  },
-  {
-    title: "Acervo de Fotos & Acompanhamento de Obras",
-    description: "Relatórios mensais em foto e vídeo de evolução da construção",
-    category: "Fotos de Obra",
-    url: DRIVE_ROOT_URL,
-    icon: "Camera"
   }
 ];
