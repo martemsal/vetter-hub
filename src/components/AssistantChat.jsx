@@ -2,25 +2,24 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Send, Sparkles, Bot, 
   Mic, MicOff, Volume2, VolumeX, Download, Eye, 
-  Share2, FileText, Image, FileSpreadsheet, X, CheckCircle, Search, AlertCircle 
+  Share2, FileSpreadsheet, FileText, CheckCircle, Search, ExternalLink 
 } from 'lucide-react';
 import { getStoredDriveIndex } from '../data/driveIndex';
 import { searchDriveWithGeminiIntelligence } from '../utils/geminiDriveEngine';
 
 export default function AssistantChat() {
-  const [driveFiles, setDriveFiles] = useState(() => getStoredDriveIndex());
+  const [driveFiles] = useState(() => getStoredDriveIndex());
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: 'assistant',
-      text: 'Olá! Estou conectado às pastas do **Google Drive** com inteligência de busca precisa.\n\n🎙️ Fale por voz ou digite o arquivo que você quer (ex: *"Tabela do Bal Harbour"* ou *"Planta do Royal Bay"*).\n\nEu localizo e trago **somente o arquivo exato solicitado** para você baixar na hora.',
+      text: 'Olá! Sou seu assistente conectado diretamente à pasta do **Google Drive**.\n\n🎙️ Fale por áudio ou digite o arquivo desejado (ex: *"Tabela do Bal Harbour"*, *"Tabela do Royal Bay"* ou *"Apresentação The Wave"*).\n\nEu identifico o arquivo na pasta e trago o **link de download direto e prévia** na tela.',
       files: []
     }
   ]);
   const [inputText, setInputText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessingVoice, setIsProcessingVoice] = useState(false);
-  const [previewFile, setPreviewFile] = useState(null);
   const [speakingMsgId, setSpeakingMsgId] = useState(null);
   
   const messagesEndRef = useRef(null);
@@ -124,17 +123,15 @@ export default function AssistantChat() {
   };
 
   const handleDownload = (file) => {
-    const link = document.createElement('a');
-    link.href = file.url;
-    link.download = file.name;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    window.open(file.url, '_blank');
+  };
+
+  const handlePreview = (file) => {
+    window.open(file.viewUrl, '_blank');
   };
 
   const handleShareFile = (file) => {
-    const text = `Arquivo Oficial Vetter: *${file.title}*\nDownload direto: ${file.url}`;
+    const text = `Arquivo Oficial Google Drive: *${file.name}*\nVisualizar no Drive: ${file.viewUrl}`;
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -172,13 +169,13 @@ export default function AssistantChat() {
         const assistantMsg = {
           id: newMsgId,
           sender: 'assistant',
-          text: `Arquivo localizado no Google Drive: **${searchResult.file.propertyName}**`,
+          text: `Arquivo localizado: **${searchResult.file.propertyName}**`,
           files: [searchResult.file]
         };
         setMessages((prev) => [...prev, assistantMsg]);
 
         if (wasVoice) {
-          speakText(`Aqui está a ${searchResult.file.title}`, newMsgId);
+          speakText(`Aqui está o arquivo ${searchResult.file.name}`, newMsgId);
         }
       } else {
         const assistantMsg = {
@@ -197,11 +194,8 @@ export default function AssistantChat() {
   };
 
   const getFileIcon = (file) => {
-    if (file.type === 'pdf') {
-      if (file.category === 'tabela') return <FileSpreadsheet size={20} color="var(--accent-emerald)" />;
-      return <FileText size={20} color="var(--gold-primary)" />;
-    }
-    return <Image size={20} color="var(--accent-cyan)" />;
+    if (file.category === 'tabela') return <FileSpreadsheet size={20} color="var(--accent-emerald)" />;
+    return <FileText size={20} color="var(--gold-primary)" />;
   };
 
   return (
@@ -213,10 +207,10 @@ export default function AssistantChat() {
             <Sparkles size={16} />
           </div>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700 }}>Busca de Arquivos Google Drive</div>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>Busca Gemini no Google Drive</div>
             <div style={{ fontSize: 11, color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: 4 }}>
               <CheckCircle size={12} />
-              <span>{driveFiles.length} arquivos indexados nas pastas</span>
+              <span>{driveFiles.length} arquivos sincronizados nas pastas</span>
             </div>
           </div>
         </div>
@@ -246,7 +240,7 @@ export default function AssistantChat() {
       {isProcessingVoice && (
         <div className="voice-status-banner" style={{ background: 'rgba(230, 195, 92, 0.15)', borderColor: 'var(--gold-primary)', color: 'var(--gold-primary)' }}>
           <Search size={14} />
-          <span>Buscando arquivo nas pastas do Google Drive...</span>
+          <span>Vasculhando arquivos nas pastas do Google Drive...</span>
         </div>
       )}
 
@@ -295,7 +289,7 @@ export default function AssistantChat() {
                       <button 
                         className="file-btn-download"
                         onClick={() => handleDownload(file)}
-                        title="Baixar arquivo agora"
+                        title="Baixar arquivo direto do Google Drive"
                       >
                         <Download size={14} />
                         <span>Baixar Arquivo</span>
@@ -303,11 +297,12 @@ export default function AssistantChat() {
 
                       <button 
                         className="file-btn-preview"
-                        onClick={() => setPreviewFile(file)}
-                        title="Visualizar na tela"
+                        onClick={() => handlePreview(file)}
+                        title="Visualizar no Google Drive"
                       >
                         <Eye size={14} />
-                        <span>Prévia</span>
+                        <span>Ver no Drive</span>
+                        <ExternalLink size={11} />
                       </button>
 
                       <button 
@@ -327,13 +322,15 @@ export default function AssistantChat() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Sugestões Rápidas */}
+      {/* Sugestões Rápidas com Empreendimentos Reais da Pasta */}
       <div className="chat-suggestions-row">
         {[
           'Tabela do Bal Harbour',
           'Tabela do Royal Bay',
           'Tabela do The Ocean',
-          'Planta do Palm Beach'
+          'Apresentação The Wave',
+          'Tabela Blue Coast',
+          'Tabela Destin Beach'
         ].map((prompt, idx) => (
           <button
             key={idx}
@@ -370,60 +367,6 @@ export default function AssistantChat() {
           <Send size={16} />
         </button>
       </div>
-
-      {/* Modal de Prévia */}
-      {previewFile && (
-        <div className="modal-overlay" onClick={() => setPreviewFile(null)}>
-          <div 
-            className="modal-bottom-sheet" 
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxHeight: '94vh' }}
-          >
-            <div className="sheet-handle-bar">
-              <div className="sheet-handle" />
-            </div>
-
-            <div className="modal-header">
-              <div>
-                <span className="gold-badge">{previewFile.type.toUpperCase()}</span>
-                <h3 style={{ fontSize: 16, marginTop: 4 }}>{previewFile.title}</h3>
-                <div style={{ fontSize: 12, color: 'var(--gold-primary)', fontFamily: 'monospace' }}>{previewFile.name} • {previewFile.size}</div>
-              </div>
-              <button className="modal-close-btn" onClick={() => setPreviewFile(null)}>
-                <X size={18} />
-              </button>
-            </div>
-
-            <div style={{ padding: 16, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ width: '100%', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#020617', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
-                <img 
-                  src={previewFile.previewImage || previewFile.url} 
-                  alt={previewFile.title} 
-                  style={{ width: '100%', maxHeight: '60vh', objectFit: 'contain', display: 'block' }} 
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button 
-                  className="btn-primary" 
-                  onClick={() => handleDownload(previewFile)}
-                  style={{ flex: 1 }}
-                >
-                  <Download size={16} />
-                  <span>Baixar Arquivo</span>
-                </button>
-                <button 
-                  className="btn-secondary" 
-                  onClick={() => handleShareFile(previewFile)}
-                >
-                  <Share2 size={16} />
-                  <span>WhatsApp</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

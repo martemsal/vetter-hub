@@ -1,12 +1,6 @@
-// Motor de Busca Neural Estilo Gemini para Google Drive (Zero Alucinações)
-import { normalizeText, extractKeywords, detectCategoryIntent } from './searchEngine';
+// Motor de Busca Neural Estilo Gemini para Google Drive
+import { normalizeText, extractKeywords } from './searchEngine';
 
-/**
- * Busca de Alta Precisão nos arquivos do Google Drive
- * @param {string} userQuery - Pergunta ou pedido do usuário (texto ou transcrição de voz)
- * @param {Array} driveFiles - Lista completa de arquivos indexados do Drive
- * @returns {Object} { status: 'found'|'not_found', file: Object|null, message: string, confidence: number }
- */
 export function searchDriveWithGeminiIntelligence(userQuery, driveFiles) {
   if (!userQuery || !driveFiles || driveFiles.length === 0) {
     return {
@@ -19,7 +13,6 @@ export function searchDriveWithGeminiIntelligence(userQuery, driveFiles) {
 
   const normQuery = normalizeText(userQuery);
   const queryTokens = extractKeywords(userQuery);
-  const detectedCategories = detectCategoryIntent(userQuery);
 
   let scoredFiles = [];
 
@@ -29,79 +22,67 @@ export function searchDriveWithGeminiIntelligence(userQuery, driveFiles) {
     const normFileTitle = normalizeText(file.title);
     const normPropName = normalizeText(file.propertyName);
 
-    // 1. Match em Aliases Diretos (Ex: "tabela do bal harbour", "tabela bal harbour")
+    // 1. Correspondência em Aliases Reais
     if (file.aliases && Array.isArray(file.aliases)) {
       for (const alias of file.aliases) {
         const normAlias = normalizeText(alias);
         if (normQuery.includes(normAlias) || normAlias.includes(normQuery)) {
-          score += 35.0; // Correspondência quase exata de intenção
+          score += 40.0; // Forte correspondência
           break;
         }
       }
     }
 
-    // 2. Score por Nome do Empreendimento (Bal Harbour, Royal Bay, The Ocean, etc.)
-    let propMatched = false;
+    // 2. Correspondência no Nome do Arquivo Real do Drive
     if (normQuery.includes(normPropName)) {
-      score += 20.0;
-      propMatched = true;
+      score += 25.0;
     } else {
-      // Checa se tokens essenciais do empreendimento batem
       const propTokens = extractKeywords(file.propertyName);
-      let matchCount = 0;
       for (const pt of propTokens) {
-        if (queryTokens.includes(pt) || normQuery.includes(pt)) {
-          matchCount++;
+        if (normQuery.includes(pt)) {
+          score += 10.0;
         }
       }
-      if (matchCount > 0 && matchCount >= propTokens.length * 0.5) {
-        score += matchCount * 8.0;
-        propMatched = true;
-      }
     }
 
-    // 3. Score por Categoria do Arquivo (tabela, book, planta, foto)
-    if (detectedCategories && detectedCategories.includes(file.category)) {
-      score += 15.0;
-    }
-
-    // 4. Score por palavras no Nome do Arquivo / Título
+    // 3. Tokens no nome do arquivo
     for (const token of queryTokens) {
-      if (normFileName.includes(token)) score += 3.0;
+      if (normFileName.includes(token)) score += 4.0;
       if (normFileTitle.includes(token)) score += 3.0;
     }
 
-    // 5. Penalização se a categoria detectada for conflitante
-    if (detectedCategories && !detectedCategories.includes(file.category)) {
-      score -= 10.0;
+    // 4. Intenções Específicas
+    if (normQuery.includes('tabela') && file.category === 'tabela') score += 10.0;
+    if (normQuery.includes('book') || normQuery.includes('apresentacao') || normQuery.includes('apresentação')) {
+      if (file.category === 'book') score += 15.0;
     }
 
-    if (score > 12.0) {
+    if (score > 10.0) {
       scoredFiles.push({ file, score });
     }
   }
 
-  // Ordenar por score decrescente
   scoredFiles.sort((a, b) => b.score - a.score);
 
-  // Validação Estrita (Zero Alucinação / Sem arquivos aleatórios)
-  const THRESHOLD = 22.0;
+  const THRESHOLD = 16.0;
 
   if (scoredFiles.length > 0 && scoredFiles[0].score >= THRESHOLD) {
     const bestMatch = scoredFiles[0].file;
     return {
       status: 'found',
       file: bestMatch,
-      message: `Arquivo localizado: **${bestMatch.propertyName}**`,
+      message: `Arquivo localizado: **${bestMatch.name}**`,
       confidence: scoredFiles[0].score
     };
   }
 
-  // SE NÃO ENCONTROU O ARQUIVO ESPECÍFICO, NÃO TRAGA OUTRO ALEATÓRIO!
+  // Lista dos nomes dos empreendimentos disponíveis no Drive
+  const availableProps = Array.from(new Set(driveFiles.map(f => f.propertyName)));
+
   return {
     status: 'not_found',
     file: null,
-    message: `❌ Não localizei o arquivo para **"${userQuery}"** nas pastas do Google Drive.\n\nVerifique se o nome do empreendimento ou documento está correto (ex: *Bal Harbour*, *Royal Bay*, *The Ocean*, *Palm Beach*, *Sunset* ou *Grand Palais*).`,
+    message: `❌ Não localizei o arquivo para **"${userQuery}"** dentro das pastas do Google Drive.\n\n📂 **Arquivos e Tabelas disponíveis no Drive:**\n${availableProps.slice(0, 8).map(p => `• ${p}`).join('\n')}`,
     confidence: 0
   };
 }
