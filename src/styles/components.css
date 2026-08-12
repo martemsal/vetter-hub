@@ -871,15 +871,16 @@
 
 /* File Download Cards in Chat */
 .chat-file-card {
-  margin-top: 10px;
-  background: rgba(14, 23, 46, 0.95);
+  margin-top: 8px;
+  background: rgba(14, 23, 46, 0.98);
   border: 1px solid var(--border-gold);
   border-radius: var(--radius-md);
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+  max-width: 100%;
 }
 
 .file-header-row {
@@ -889,8 +890,8 @@
 }
 
 .file-type-icon-box {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 8px;
   background: var(--gold-subtle);
   border: 1px solid var(--border-gold);
@@ -910,28 +911,27 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .file-meta-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 11px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .file-actions-row {
   display: flex;
   gap: 6px;
+  margin-top: 2px;
 }
 
 .file-btn-download {
   flex: 1;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: var(--radius-sm);
   background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-dark) 100%);
   color: var(--text-inverse);
@@ -941,8 +941,8 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  box-shadow: 0 2px 8px rgba(230, 195, 92, 0.25);
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(230, 195, 92, 0.3);
+  transition: all 0.15s ease;
 }
 
 .file-btn-download:active {
@@ -950,7 +950,7 @@
 }
 
 .file-btn-preview {
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--border-subtle);
@@ -970,7 +970,7 @@
 
 .file-preview-image-box {
   width: 100%;
-  max-height: 180px;
+  max-height: 120px;
   border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid var(--border-subtle);
@@ -985,6 +985,7 @@
 }
 
 /* Animations */
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
