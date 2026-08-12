@@ -1,18 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Send, Sparkles, Bot, HardDrive, ExternalLink, 
+  Send, Sparkles, Bot, HardDrive, 
   Mic, MicOff, Volume2, VolumeX, Download, Eye, 
   Share2, FileText, Image, FileSpreadsheet, X, CheckCircle, Search 
 } from 'lucide-react';
-import { PROPERTIES_DATA, DRIVE_ROOT_URL } from '../data/properties';
+import { PROPERTIES_DATA } from '../data/properties';
 import { findMatchingFiles } from '../utils/searchEngine';
 
-export default function AssistantChat({ onNavigateToPlan }) {
+export default function AssistantChat() {
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: 'assistant',
-      text: 'Olá! Sou seu **Assistente Agêntico Imobiliário Vetter** com Leitura Semântica de Arquivos do Google Drive.\n\n🎙️ **Fale por voz** ou digite qualquer solicitação:\nMesmo que você peça com nomes parciais (ex: *"quero a tabela do The Ocean"*), eu vasculho todas as pastas e identifico o arquivo correto (ex: *Tabela Ocean Park Torre Norte - Agosto 2026.pdf*) trazendo na tela para você baixar na hora!\n\nExperimente falar:\n• "Quero a tabela do The Ocean"\n• "Me dê a planta do Palm Beach"\n• "Baixar book do Grand Palais"',
+      text: 'Olá! Fale ou digite o arquivo que você precisa (ex: *"quero a tabela do The Ocean"*).\nEu localizo nas pastas e trago **exclusivamente o arquivo solicitado** na tela para você baixar.',
       files: []
     }
   ]);
@@ -27,7 +27,7 @@ export default function AssistantChat({ onNavigateToPlan }) {
   const silenceTimerRef = useRef(null);
   const latestTranscriptRef = useRef('');
 
-  // Reconhecimento de Voz com Auto-Send (Gemini / WhatsApp Style)
+  // Reconhecimento de Voz com Envio Automático ao terminar de falar
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -50,7 +50,6 @@ export default function AssistantChat({ onNavigateToPlan }) {
         latestTranscriptRef.current = transcript;
         setInputText(transcript);
 
-        // Auto-send após 1.1s de silêncio
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
         silenceTimerRef.current = setTimeout(() => {
           if (recognitionRef.current) {
@@ -102,7 +101,6 @@ export default function AssistantChat({ onNavigateToPlan }) {
     }
   };
 
-  // Síntese de Voz (TTS)
   const speakText = (text, msgId) => {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
@@ -135,7 +133,7 @@ export default function AssistantChat({ onNavigateToPlan }) {
   };
 
   const handleShareFile = (file) => {
-    const text = `Arquivo Oficial Vetter: *${file.name}*\n${file.title}\nDownload direto: ${file.url}`;
+    const text = `Arquivo Oficial Vetter: *${file.title}*\nDownload direto: ${file.url}`;
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -164,22 +162,17 @@ export default function AssistantChat({ onNavigateToPlan }) {
     latestTranscriptRef.current = '';
     setIsProcessingVoice(false);
 
-    // Executa a Busca Semântica e Leitura de Arquivos das Pastas
     setTimeout(() => {
       const searchResult = findMatchingFiles(query, PROPERTIES_DATA);
-      const { matchedFiles, matchedProperty, confidenceScore } = searchResult;
+      const { matchedFiles, matchedProperty } = searchResult;
 
       let replyText = '';
 
       if (matchedFiles && matchedFiles.length > 0) {
-        const firstFile = matchedFiles[0];
-        const propName = firstFile.propertyName || matchedProperty?.name || 'Empreendimento Vetter';
-        
-        replyText = `🔍 Vasculhei as pastas do Google Drive e identifiquei o arquivo correspondente para a sua solicitação sobre **${propName}**:\n\n` +
-          `📄 **Arquivo identificado:** \`${firstFile.name}\`\n` +
-          `O arquivo está pronto na tela para download direto ou visualização:`;
+        const file = matchedFiles[0];
+        replyText = `Aqui está o arquivo solicitado:`;
       } else {
-        replyText = `Não localizei nenhum arquivo com os termos solicitados. Mostrando arquivos gerais dos empreendimentos no Google Drive:`;
+        replyText = `Nenhum arquivo correspondente foi encontrado para a sua solicitação.`;
       }
 
       const newMsgId = Date.now() + 1;
@@ -192,11 +185,10 @@ export default function AssistantChat({ onNavigateToPlan }) {
 
       setMessages((prev) => [...prev, assistantMsg]);
 
-      // Se solicitado por voz, responde em áudio automaticamente
-      if (wasVoice) {
-        speakText(replyText, newMsgId);
+      if (wasVoice && matchedFiles && matchedFiles.length > 0) {
+        speakText(`Aqui está o arquivo ${matchedFiles[0].title}`, newMsgId);
       }
-    }, 550);
+    }, 450);
   };
 
   const getFileIcon = (file) => {
@@ -216,16 +208,16 @@ export default function AssistantChat({ onNavigateToPlan }) {
             <Sparkles size={16} />
           </div>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700 }}>Assistente com Leitor Semântico de Pastas</div>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>Assistente de Entrega Direta</div>
             <div style={{ fontSize: 11, color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: 4 }}>
               <CheckCircle size={12} />
-              <span>Busca Inteligente por Sinônimos & Arquivos Reais</span>
+              <span>Entrega Exclusiva do Arquivo Solicitado</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Banner de Gravação de Áudio */}
+      {/* Banner de Gravação */}
       {isRecording && (
         <div className="voice-status-banner">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -235,7 +227,7 @@ export default function AssistantChat({ onNavigateToPlan }) {
               <div className="voice-bar" />
               <div className="voice-bar" />
             </div>
-            <span>🎙️ Ouvindo... Fale o arquivo (envia automaticamente ao parar)</span>
+            <span>🎙️ Ouvindo... (envia ao parar de falar)</span>
           </div>
           <button 
             onClick={toggleVoiceRecording} 
@@ -249,7 +241,7 @@ export default function AssistantChat({ onNavigateToPlan }) {
       {isProcessingVoice && (
         <div className="voice-status-banner" style={{ background: 'rgba(230, 195, 92, 0.15)', borderColor: 'var(--gold-primary)', color: 'var(--gold-primary)' }}>
           <Search size={14} />
-          <span>Vasculhando arquivos nas pastas do Google Drive...</span>
+          <span>Localizando o arquivo no Google Drive...</span>
         </div>
       )}
 
@@ -260,7 +252,7 @@ export default function AssistantChat({ onNavigateToPlan }) {
             {msg.sender === 'assistant' && (
               <div className="assistant-avatar-row">
                 <Bot size={14} color="var(--gold-primary)" />
-                <span className="assistant-badge-name">Vetter Drive Engine</span>
+                <span className="assistant-badge-name">Vetter Arquivos</span>
               </div>
             )}
             
@@ -270,7 +262,7 @@ export default function AssistantChat({ onNavigateToPlan }) {
               ))}
             </div>
 
-            {/* Cards de Arquivos para Download e Prévia Direta na Tela */}
+            {/* Renderiza SOMENTE O ARQUIVO SOLICITADO */}
             {msg.files && msg.files.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
                 {msg.files.map((file) => (
@@ -307,7 +299,7 @@ export default function AssistantChat({ onNavigateToPlan }) {
                       <button 
                         className="file-btn-download"
                         onClick={() => handleDownload(file)}
-                        title="Baixar arquivo no celular ou PC"
+                        title="Baixar arquivo agora"
                       >
                         <Download size={14} />
                         <span>Baixar Arquivo</span>
@@ -334,47 +326,18 @@ export default function AssistantChat({ onNavigateToPlan }) {
                 ))}
               </div>
             )}
-
-            {/* Controle de Ouvir Áudio */}
-            {msg.sender === 'assistant' && (
-              <div style={{ marginTop: 6 }}>
-                <button 
-                  className={`speak-response-btn ${speakingMsgId === msg.id ? 'speaking' : ''}`}
-                  onClick={() => {
-                    if (speakingMsgId === msg.id) {
-                      window.speechSynthesis.cancel();
-                      setSpeakingMsgId(null);
-                    } else {
-                      speakText(msg.text, msg.id);
-                    }
-                  }}
-                >
-                  {speakingMsgId === msg.id ? (
-                    <>
-                      <VolumeX size={12} />
-                      <span>Parar Áudio</span>
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 size={12} />
-                      <span>Ouvir em Voz Alta</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Sugestões de Teste Semântico */}
+      {/* Sugestões Rápidas */}
       <div className="chat-suggestions-row">
         {[
           'Quero a tabela do The Ocean',
-          'Me dê a tabela do Palm Beach',
-          'Planta cotada The Ocean',
-          'Book comercial Grand Palais'
+          'Tabela do Palm Beach',
+          'Planta do Ocean',
+          'Book do Grand Palais'
         ].map((prompt, idx) => (
           <button
             key={idx}
@@ -399,7 +362,7 @@ export default function AssistantChat({ onNavigateToPlan }) {
 
         <input
           type="text"
-          placeholder={isRecording ? "Ouvindo sua voz... (envia ao parar)" : "Fale ou digite (ex: quero a tabela do The Ocean)..."}
+          placeholder={isRecording ? "Ouvindo sua voz... (envia ao parar)" : "Ex: quero a tabela do The Ocean..."}
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={(e) => {
@@ -412,7 +375,7 @@ export default function AssistantChat({ onNavigateToPlan }) {
         </button>
       </div>
 
-      {/* Modal de Prévia de Arquivo */}
+      {/* Modal de Prévia */}
       {previewFile && (
         <div className="modal-overlay" onClick={() => setPreviewFile(null)}>
           <div 
@@ -451,7 +414,7 @@ export default function AssistantChat({ onNavigateToPlan }) {
                   style={{ flex: 1 }}
                 >
                   <Download size={16} />
-                  <span>Baixar Arquivo Agora</span>
+                  <span>Baixar Arquivo</span>
                 </button>
                 <button 
                   className="btn-secondary" 
