@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Sparkles, Building2, SlidersHorizontal, MapPin } from 'lucide-react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { Search, Sparkles, Building2, Mic, MicOff, Layers, FolderArchive, Bot } from 'lucide-react';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
 import PropertyCard from './components/PropertyCard';
@@ -15,6 +15,49 @@ export default function App() {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [activePropertyModal, setActivePropertyModal] = useState(null);
   const [selectedPlanPropId, setSelectedPlanPropId] = useState(null);
+  const [isSearchingVoice, setIsSearchingVoice] = useState(false);
+  const searchRecognitionRef = useRef(null);
+
+  // Inicialização do microfone para busca rápida por voz
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const rec = new SpeechRecognition();
+      rec.lang = 'pt-BR';
+      rec.continuous = false;
+      rec.interimResults = true;
+
+      rec.onstart = () => setIsSearchingVoice(true);
+      rec.onresult = (e) => {
+        let transcript = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          transcript += e.results[i][0].transcript;
+        }
+        setSearchQuery(transcript);
+      };
+      rec.onerror = () => setIsSearchingVoice(false);
+      rec.onend = () => setIsSearchingVoice(false);
+      searchRecognitionRef.current = rec;
+    }
+  }, []);
+
+  const toggleSearchVoice = () => {
+    if (!searchRecognitionRef.current) {
+      alert('Reconhecimento de voz não suportado neste navegador.');
+      return;
+    }
+    if (isSearchingVoice) {
+      searchRecognitionRef.current.stop();
+      setIsSearchingVoice(false);
+    } else {
+      setSearchQuery('');
+      try {
+        searchRecognitionRef.current.start();
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+  };
 
   const filterOptions = [
     { id: 'all', label: 'Todos os Imóveis' },
@@ -68,20 +111,31 @@ export default function App() {
                 Catálogo de <span className="gold-gradient-text">Empreendimentos Vetter</span>
               </h1>
               <p className="hero-subtitle">
-                Acesse plantas, tabelas de vendas, fotos e pastas do Google Drive com rapidez no seu celular.
+                Acesse plantas, tabelas de vendas, fotos e pastas do Google Drive digitando ou **falando por áudio**.
               </p>
             </div>
 
-            {/* Seção de Busca e Filtros */}
+            {/* Seção de Busca e Filtros com Microfone */}
             <div className="search-filter-section">
               <div className="search-input-box">
                 <Search size={18} color="var(--text-muted)" />
                 <input
                   type="text"
-                  placeholder="Buscar por empreendimento, praia, suítes..."
+                  placeholder={isSearchingVoice ? "Ouvindo... fale o nome do imóvel" : "Buscar por nome, praia, suítes ou falar..."}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
+                
+                <button
+                  type="button"
+                  className={`voice-record-btn ${isSearchingVoice ? 'recording' : ''}`}
+                  onClick={toggleSearchVoice}
+                  title="Buscar falando por áudio"
+                  style={{ width: 30, height: 30 }}
+                >
+                  {isSearchingVoice ? <MicOff size={15} /> : <Mic size={15} />}
+                </button>
+
                 {searchQuery && (
                   <button 
                     onClick={() => setSearchQuery('')}

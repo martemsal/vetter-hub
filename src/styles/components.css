@@ -765,6 +765,110 @@
   justify-content: center;
 }
 
+/* Audio / Voice Recording Styles */
+.voice-record-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.voice-record-btn:hover, .voice-record-btn:active {
+  background: var(--gold-subtle);
+  color: var(--gold-primary);
+  border-color: var(--gold-primary);
+}
+
+.voice-record-btn.recording {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: var(--accent-rose);
+  color: var(--accent-rose);
+  animation: pulseRecording 1.4s infinite;
+}
+
+@keyframes pulseRecording {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+  }
+}
+
+.voice-status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  border-radius: var(--radius-md);
+  color: #fecdd3;
+  font-size: 12px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease;
+}
+
+.voice-wave-bars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 14px;
+}
+
+.voice-bar {
+  width: 3px;
+  height: 100%;
+  background: var(--accent-rose);
+  border-radius: 2px;
+  animation: waveBar 0.8s infinite ease-in-out alternate;
+}
+
+.voice-bar:nth-child(2) { animation-delay: 0.2s; height: 60%; }
+.voice-bar:nth-child(3) { animation-delay: 0.4s; height: 90%; }
+.voice-bar:nth-child(4) { animation-delay: 0.1s; height: 40%; }
+
+@keyframes waveBar {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1); }
+}
+
+.speak-response-btn {
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  transition: all 0.2s ease;
+}
+
+.speak-response-btn:hover, .speak-response-btn:active {
+  background: var(--gold-subtle);
+  color: var(--gold-primary);
+  border-color: var(--border-gold);
+}
+
+.speak-response-btn.speaking {
+  color: var(--gold-primary);
+  border-color: var(--gold-primary);
+  background: var(--gold-subtle);
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -796,3 +900,4 @@
     transform: translateX(-50%);
   }
 }
+

@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Bot, User, HardDrive, ExternalLink, ArrowRight } from 'lucide-react';
+import { 
+  Send, Sparkles, Bot, HardDrive, ExternalLink, 
+  Mic, MicOff, Volume2, VolumeX, Square 
+} from 'lucide-react';
 import { PROPERTIES_DATA, DRIVE_ROOT_URL } from '../data/properties';
 
 export default function AssistantChat({ onNavigateToPlan }) {
@@ -7,11 +10,15 @@ export default function AssistantChat({ onNavigateToPlan }) {
     {
       id: 1,
       sender: 'assistant',
-      text: 'Olá! Sou seu **Assistente Agêntico Imobiliário Vetter**.\n\nEstou conectado à base de empreendimentos e à pasta do **Google Drive**. Como posso te ajudar hoje?\n\n• Localizar plantas e arquivos\n• Analisar dimensões de cômodos e cotas\n• Fornecer tabelas e apresentações comerciais'
+      text: 'Olá! Sou seu **Assistente Agêntico Imobiliário Vetter**.\n\nVocê pode me perguntar digitando ou **falando por áudio no microfone**!\n\n• "Quais empreendimentos têm 4 suítes?"\n• "Qual a metragem do living no Palm Beach?"\n• "Link da tabela de preços e pasta do Google Drive"'
     }
   ]);
   const [inputText, setInputText] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(true);
+  const [speakingMsgId, setSpeakingMsgId] = useState(null);
   const messagesEndRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   const quickPrompts = [
     'Qual a metragem da suíte master no Palm Beach?',
@@ -19,6 +26,97 @@ export default function AssistantChat({ onNavigateToPlan }) {
     'Link da tabela de vendas e pasta do Drive',
     'Dimensões do living no Ocean Breeze'
   ];
+
+  // Configuração do Reconhecimento de Voz (Web Speech API)
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'pt-BR';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        setIsRecording(true);
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        setInputText(transcript);
+      };
+
+      recognition.onerror = (event) => {
+        console.warn('Speech recognition error:', event.error);
+        setIsRecording(false);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current = recognition;
+    } else {
+      setVoiceSupported(false);
+    }
+
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  const toggleVoiceRecording = () => {
+    if (!recognitionRef.current) {
+      alert('Seu navegador não suporta reconhecimento de voz direto. Tente no Google Chrome ou Safari.');
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else {
+      setInputText('');
+      try {
+        recognitionRef.current.start();
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+  };
+
+  // Síntese de Voz (Text-to-Speech)
+  const toggleSpeak = (msgId, text) => {
+    if (!('speechSynthesis' in window)) return;
+
+    if (speakingMsgId === msgId) {
+      window.speechSynthesis.cancel();
+      setSpeakingMsgId(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    
+    // Limpa marcações markdown para leitura natural
+    const cleanText = text
+      .replace(/\*\*/g, '')
+      .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+      .replace(/•/g, '')
+      .replace(/[\n\r]+/g, '. ');
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'pt-BR';
+    utterance.rate = 1.05;
+
+    utterance.onend = () => setSpeakingMsgId(null);
+    utterance.onerror = () => setSpeakingMsgId(null);
+
+    setSpeakingMsgId(msgId);
+    window.speechSynthesis.speak(utterance);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -60,12 +158,12 @@ export default function AssistantChat({ onNavigateToPlan }) {
           `• **Localização:** A apenas 50 metros da areia da praia\n` +
           `• **Status:** Em construção (Entrega: Jun/2027)\n\n` +
           `📂 [Acessar Arquivos no Google Drive](${DRIVE_ROOT_URL})`;
-      } else if (lower.includes('tabela') || lower.includes('vendas') || lower.includes('preço') || lower.includes('drive')) {
+      } else if (lower.includes('tabela') || lower.includes('vendas') || lower.includes('preço') || lower.includes('drive') || lower.includes('pasta')) {
         reply = `📊 **Acesso aos Documentos Oficiais Vetter:**\n\n` +
           `• **Pasta Raiz do Google Drive:** [Abrir Pasta Geral do Drive](${DRIVE_ROOT_URL})\n` +
           `• **Tabelas de Vendas:** Disponíveis no Drive com condições de parcelamento direto e fluxo de obra.\n` +
           `• **Books e Plantas em PDF:** Todos os arquivos em alta resolução sincronizados.`;
-      } else if (lower.includes('4 suítes') || lower.includes('frente mar')) {
+      } else if (lower.includes('4 suítes') || lower.includes('quatro suítes') || lower.includes('frente mar')) {
         reply = `💎 **Empreendimentos Frente Mar com 4 Suítes:**\n\n` +
           `1. **Palm Beach Vetter:** Piçarras • 178m² a 285m² • 3 a 4 Vagas • Frente Mar Total\n` +
           `2. **Grand Palais Vetter:** Penha • 195m² a 340m² • 4 Suítes Plenas • Alto Luxo Boutique\n\n` +
@@ -94,14 +192,35 @@ export default function AssistantChat({ onNavigateToPlan }) {
             <Sparkles size={16} />
           </div>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700 }}>Assistente Agêntico Vetter</div>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>Assistente por Voz & Texto</div>
             <div style={{ fontSize: 11, color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: 4 }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-emerald)', display: 'inline-block' }} />
-              Conectado ao Drive & Base de Plantas
+              Voz e Áudio Ativados • Drive Sincronizado
             </div>
           </div>
         </div>
       </div>
+
+      {isRecording && (
+        <div className="voice-status-banner">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="voice-wave-bars">
+              <div className="voice-bar" />
+              <div className="voice-bar" />
+              <div className="voice-bar" />
+              <div className="voice-bar" />
+            </div>
+            <span>Ouvindo sua voz... Fale o que procura</span>
+          </div>
+          <button 
+            onClick={toggleVoiceRecording} 
+            style={{ color: 'var(--accent-rose)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}
+          >
+            <Square size={13} fill="currentColor" />
+            <span>Parar</span>
+          </button>
+        </div>
+      )}
 
       <div className="chat-messages-area">
         {messages.map((msg) => (
@@ -114,7 +233,6 @@ export default function AssistantChat({ onNavigateToPlan }) {
             )}
             <div style={{ whiteSpace: 'pre-line' }}>
               {msg.text.split('\n').map((line, i) => {
-                // Link markdown simples
                 if (line.includes('[') && line.includes('](')) {
                   const label = line.substring(line.indexOf('[') + 1, line.indexOf(']('));
                   const url = line.substring(line.indexOf('](') + 2, line.indexOf(')'));
@@ -134,6 +252,28 @@ export default function AssistantChat({ onNavigateToPlan }) {
                 return <p key={i} style={{ margin: '2px 0' }}>{line}</p>;
               })}
             </div>
+
+            {msg.sender === 'assistant' && (
+              <div>
+                <button 
+                  className={`speak-response-btn ${speakingMsgId === msg.id ? 'speaking' : ''}`}
+                  onClick={() => toggleSpeak(msg.id, msg.text)}
+                  title="Ouvir resposta por áudio"
+                >
+                  {speakingMsgId === msg.id ? (
+                    <>
+                      <VolumeX size={12} />
+                      <span>Parar Áudio</span>
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 size={12} />
+                      <span>Ouvir Resposta</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         ))}
         <div ref={messagesEndRef} />
@@ -152,17 +292,27 @@ export default function AssistantChat({ onNavigateToPlan }) {
         ))}
       </div>
 
-      {/* Campo de Entrada de Mensagem */}
+      {/* Campo de Entrada de Mensagem com Microfone */}
       <div className="chat-input-bar">
+        <button 
+          className={`voice-record-btn ${isRecording ? 'recording' : ''}`}
+          onClick={toggleVoiceRecording}
+          title={isRecording ? 'Parar gravação de voz' : 'Falar por áudio'}
+          aria-label="Gravar áudio"
+        >
+          {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
+        </button>
+
         <input
           type="text"
-          placeholder="Pergunte sobre plantas, cotas, tabelas..."
+          placeholder={isRecording ? "Ouvindo sua voz..." : "Digite ou fale sua dúvida..."}
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSend();
           }}
         />
+
         <button className="chat-send-btn" onClick={() => handleSend()} aria-label="Enviar">
           <Send size={16} />
         </button>
