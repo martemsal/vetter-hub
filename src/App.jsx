@@ -10,6 +10,8 @@ import DriveQuickHub from './components/DriveQuickHub';
 import { PROPERTIES_DATA } from './data/properties';
 import { runRealtimeDriveScanner } from './utils/driveScanner';
 import { getStoredDriveIndex } from './data/driveIndex';
+import DutyTab from './components/DutyTab';
+
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('assistant'); // 'assistant' | 'drive'
@@ -236,6 +238,10 @@ export default function App() {
 
         {activeTab === 'drive' && (
           <DriveQuickHub driveFiles={driveFiles} syncStatus={syncStatus} onRefresh={() => runRealtimeDriveScanner().then(setDriveFiles)} />
+        )}
+
+        {activeTab === 'duty' && (
+          <DutyTab />
         )}
       </main>
 
