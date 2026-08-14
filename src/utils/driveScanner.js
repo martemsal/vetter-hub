@@ -1,12 +1,9 @@
-// Scanner em Tempo Real do Google Drive para Frontend (Zero Config e Sem Chaves de API)
+// Scanner Oficial do Google Drive em Tempo Real (Pasta Litoral -> Apresentação e Tabela)
 import { INITIAL_DRIVE_INDEX, saveStoredDriveIndex } from '../data/driveIndex';
 
-const FOLDER_ID = '1hL6hQs1pqr7-sp0bdkU14CXJWe8RBcht';
-const WAVE_FOLDER_ID = '1QtIVHODdXFFi85C_G94G95KLQ9A-txKk';
-const TABELA_FOLDER_ID = '1LbjGFcq9CsiwQCpc-pCJ1z9NvPLj8y1O';
 const APRESENTACAO_FOLDER_ID = '1nrJRqWuf39hk9tJe8Swdr5VqOo1hWQuy';
+const TABELA_FOLDER_ID = '1LbjGFcq9CsiwQCpc-pCJ1z9NvPLj8y1O';
 
-// Decodifica strings com escapes hexadecimais (ex: \x5b -> [)
 function decodeHexEscapes(str) {
   return str.replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => {
     return String.fromCharCode(parseInt(hex, 16));
@@ -15,33 +12,45 @@ function decodeHexEscapes(str) {
   }).replace(/\\/g, '');
 }
 
-// Faz requisição a pastas do Drive usando Proxy CORS público e extrai itens
 async function fetchDriveFolderItems(folderId, folderName) {
-  // Tentamos usar CORSProxy.io ou AllOrigins de forma robusta com fallback
   const targetUrl = `https://drive.google.com/drive/folders/${folderId}`;
   const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
   
   try {
     const res = await fetch(proxyUrl);
-    if (!res.ok) throw new Error('Falha ao acessar proxy do Drive');
+    if (!res.ok) throw new Error('Falha ao conectar ao proxy do Drive');
     const html = await res.text();
     
-    // Captura window['_DRIVE_ivd'] que contém a lista de itens injetada pelo Drive
     const match = html.match(/window\['_DRIVE_ivd'\]\s*=\s*'([^']+)'/);
     if (match) {
       const decoded = decodeHexEscapes(match[1]);
-      const cleanJson = decoded.substring(decoded.indexOf('[[')); // garante início do array JSON
-      const parsed = JSON.parse(cleanJson);
       
-      if (Array.isArray(parsed) && parsed.length > 0 && Array.isArray(parsed[0])) {
-        return parsed[0].map(item => {
-          const id = item[0];
-          const title = item[2];
-          const mime = item[3];
-          const isFolder = mime === 'application/vnd.google-apps.folder';
-          return { id, title, mime, isFolder, folderName };
-        });
+      // Capturar todos os itens no formato ["ID", ["PARENT_ID"], "TITLE", "MIMETYPE", ...]
+      const pattern = new RegExp(`\\["([a-zA-Z0-9_\\-]+)",\\["${folderId}"\\],"([^"]+)"\\s*,\\s*"([^"]+)"`, 'g');
+      const results = [];
+      let m;
+      
+      while ((m = pattern.exec(decoded)) !== null) {
+        const item_id = m[1];
+        const title = m[2];
+        const mime = m[3];
+        const isFolder = mime === 'application/vnd.google-apps.folder';
+        results.append({ id: item_id, title, mime, isFolder });
       }
+      
+      // Fallback regex se o formato for ligeiramente diferente
+      if (results.length === 0) {
+        const fallbackPattern = /\["([a-zA-Z0-9_\-]+)",\["[^"]+"\]\s*,\s*"([^"]+)"/g;
+        while ((m = fallbackPattern.exec(decoded)) !== null) {
+          const item_id = m[1];
+          const title = m[2];
+          if (title.endsWith('.pdf') || title.endsWith('.jpg') || title.endsWith('.png') || title.endsWith('.xlsx')) {
+            results.push({ id: item_id, title, mime: 'application/pdf', isFolder: false });
+          }
+        }
+      }
+      
+      return results;
     }
   } catch (err) {
     console.warn(`Erro ao escanear pasta ${folderName}:`, err);
@@ -49,34 +58,44 @@ async function fetchDriveFolderItems(folderId, folderName) {
   return [];
 }
 
-/**
- * Executa o escaneamento em tempo real de todas as tabelas e apresentações da pasta compartilhada
- * @returns {Promise<Array>} Lista de arquivos atualizados
- */
 export async function runRealtimeDriveScanner() {
-  console.log('Iniciando varredura em tempo real na pasta do Google Drive...');
+  console.log('Iniciando varredura em tempo real no Google Drive (Litoral)...');
   
-  // 1. Escanear pasta de Apresentações
-  const presentationItems = await fetchDriveFolderItems(APRESENTACAO_FOLDER_ID, 'The Wave / Apresentação');
+  const presentationItems = await fetchDriveFolderItems(APRESENTACAO_FOLDER_ID, 'Apresentação');
+  const tableItems = await fetchDriveFolderItems(TABELA_FOLDER_ID, 'Tabela');
   
-  // 2. Escanear pasta de Tabelas
-  const tableItems = await fetchDriveFolderItems(TABELA_FOLDER_ID, 'The Wave / Tabela');
-  
-  const allScannedItems = [...presentationItems, ...tableItems].filter(item => !item.isFolder);
+  const allScannedItems = [...presentationItems, ...tableItems];
   
   if (allScannedItems.length === 0) {
-    console.log('Nenhum arquivo retornado do scanner do Drive. Usando índice local seguro.');
+    console.log('Nenhum arquivo retornado do scanner do Drive. Usando índice estático robusto.');
     return INITIAL_DRIVE_INDEX;
   }
   
-  // 3. Mapear e estruturar no formato do nosso driveIndex
+  // Mesclar dados escaneados com metadados do acervo estático
   const updatedIndex = allScannedItems.map(item => {
-    const isTable = item.folderName.includes('Tabela');
+    const isTable = item.title.toLowerCase().includes('tabela') || item.title.toLowerCase().includes('preço') || item.title.toLowerCase().includes('preco');
     const category = isTable ? 'tabela' : 'book';
     
-    // Normalizar nomes e aliases de empreendimentos
-    const cleanTitle = item.title.replace(/\.pdf$/i, '').replace(/Tabela /i, '').replace(/ - Agosto 2026/i, '').trim();
-    const propertyName = isTable ? cleanTitle : 'The Wave';
+    // Tenta encontrar correspondente no índice estático para puxar aliases ricos
+    const matchedStatic = INITIAL_DRIVE_INDEX.find(si => si.id === item.id || si.name === item.title);
+    
+    if (matchedStatic) {
+      return {
+        ...matchedStatic,
+        updatedAt: 'Sincronizado Agora'
+      };
+    }
+    
+    // Cria novo item se não existia no índice estático
+    const cleanTitle = item.title
+      .replace(/\.pdf$/i, '')
+      .replace(/\[/g, '')
+      .replace(/\]/g, '')
+      .replace(/Tabela /i, '')
+      .replace(/ - Agosto 2026/i, '')
+      .trim();
+      
+    const propertyName = cleanTitle.split(' - ')[0].split(' _ ')[0].trim();
     const propertyId = propertyName.toLowerCase().replace(/\s+/g, '-');
 
     return {
@@ -84,14 +103,14 @@ export async function runRealtimeDriveScanner() {
       driveId: item.id,
       propertyName,
       propertyId,
-      folder: item.folderName,
+      folder: isTable ? 'Tabela' : 'Apresentação',
       name: item.title,
       aliases: [
         propertyName.toLowerCase(),
         `${category} ${propertyName.toLowerCase()}`,
         `tabela do ${propertyName.toLowerCase()}`
       ],
-      title: isTable ? `Tabela ${propertyName} (Atualizada)` : `Apresentação Comercial ${propertyName}`,
+      title: item.title.replace(/\.pdf$/i, ''),
       type: 'pdf',
       category,
       size: '2.5 MB',
@@ -101,7 +120,6 @@ export async function runRealtimeDriveScanner() {
     };
   });
 
-  // Salvar no LocalStorage para os próximos acessos
   saveStoredDriveIndex(updatedIndex);
   console.log(`Varredura concluída! ${updatedIndex.length} arquivos sincronizados em tempo real.`);
   return updatedIndex;

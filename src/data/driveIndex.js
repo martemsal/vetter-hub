@@ -1,20 +1,65 @@
-// Acervo 100% Real Sincronizado do Google Drive Vetter (Pasta Compartilhada)
-// ID Raiz: 1hL6hQs1pqr7-sp0bdkU14CXJWe8RBcht
+// Acervo Completo, Real e Sincronizado do Google Drive da Vetter
 export const DRIVE_ROOT_URL = "https://drive.google.com/drive/folders/1hL6hQs1pqr7-sp0bdkU14CXJWe8RBcht?usp=sharing";
 
 export const INITIAL_DRIVE_INDEX = [
-  // ================= THE WAVE / APRESENTAÇÕES =================
+  // ================= APRESENTAÇÕES (15 ARQUIVOS REAIS) =================
+  {
+    id: "13x265bkWulRWJZOx5AMoNcVj74AgVdI5",
+    driveId: "13x265bkWulRWJZOx5AMoNcVj74AgVdI5",
+    propertyName: "Bal Harbour",
+    propertyId: "bal-harbour",
+    folder: "Apresentação",
+    name: "[BAL HARBOUR] Apresentação Comercial (1).pdf",
+    aliases: ["apresentacao bal harbour", "book bal harbour", "apresentacao bal harbor", "apresentação bal harbour", "book bal harbor"],
+    title: "Apresentação Comercial Bal Harbour",
+    type: "pdf",
+    category: "book",
+    size: "22.6 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=13x265bkWulRWJZOx5AMoNcVj74AgVdI5",
+    viewUrl: "https://drive.google.com/file/d/13x265bkWulRWJZOx5AMoNcVj74AgVdI5/view?usp=sharing"
+  },
+  {
+    id: "1AjJZkTnsFdQfFTxyfx3rlhFP3BNx_wtp",
+    driveId: "1AjJZkTnsFdQfFTxyfx3rlhFP3BNx_wtp",
+    propertyName: "Gold Coast",
+    propertyId: "gold-coast",
+    folder: "Apresentação",
+    name: "[Gold Coast] Apresentação Comercial.pdf",
+    aliases: ["apresentacao gold coast", "book gold coast", "apresentação gold coast", "book gold"],
+    title: "Apresentação Comercial Gold Coast",
+    type: "pdf",
+    category: "book",
+    size: "18.2 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1AjJZkTnsFdQfFTxyfx3rlhFP3BNx_wtp",
+    viewUrl: "https://drive.google.com/file/d/1AjJZkTnsFdQfFTxyfx3rlhFP3BNx_wtp/view?usp=sharing"
+  },
+  {
+    id: "1zsdiULrppoAtcyfP6u1wZws6kONKGsIk",
+    driveId: "1zsdiULrppoAtcyfP6u1wZws6kONKGsIk",
+    propertyName: "Sunny Island",
+    propertyId: "sunny-island",
+    folder: "Apresentação",
+    name: "[Sunny Island] Catálogo Digital WhatsApp.pdf",
+    aliases: ["apresentacao sunny island", "book sunny island", "catalogo sunny island", "sunny island"],
+    title: "Catálogo Comercial Sunny Island",
+    type: "pdf",
+    category: "book",
+    size: "8.4 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1zsdiULrppoAtcyfP6u1wZws6kONKGsIk",
+    viewUrl: "https://drive.google.com/file/d/1zsdiULrppoAtcyfP6u1wZws6kONKGsIk/view?usp=sharing"
+  },
   {
     id: "1vvRMUGLw9vBwVvA60I0epNvmH22twFcm",
     driveId: "1vvRMUGLw9vBwVvA60I0epNvmH22twFcm",
     propertyName: "The Wave",
     propertyId: "the-wave",
-    folder: "The Wave / Apresentação",
+    folder: "Apresentação",
     name: "[The Wave] Apresentação Comercial - Alta Qualidade.pdf",
-    aliases: [
-      "the wave", "wave", "apresentacao the wave", "book the wave", "apresentação the wave", "apresentacao wave", "book wave"
-    ],
-    title: "Apresentação Comercial The Wave (Alta Qualidade)",
+    aliases: ["apresentacao the wave", "book the wave", "apresentação the wave", "wave"],
+    title: "Apresentação Comercial The Wave (Alta Resolução)",
     type: "pdf",
     category: "book",
     size: "18.4 MB",
@@ -27,12 +72,10 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "15UBWzP7lWTn3cIc5X3BTWzo9PbGtbYCG",
     propertyName: "The Wave",
     propertyId: "the-wave",
-    folder: "The Wave / Apresentação",
+    folder: "Apresentação",
     name: "[The Wave] Apresentação Comercial - WhatsApp.pdf",
-    aliases: [
-      "the wave whatsapp", "apresentacao whatsapp wave", "apresentação whatsapp the wave", "wave whatsapp"
-    ],
-    title: "Apresentação Comercial The Wave (Versão WhatsApp)",
+    aliases: ["apresentacao the wave whatsapp", "book wave whatsapp", "wave whatsapp"],
+    title: "Apresentação Comercial The Wave (WhatsApp)",
     type: "pdf",
     category: "book",
     size: "5.2 MB",
@@ -40,19 +83,177 @@ export const INITIAL_DRIVE_INDEX = [
     url: "https://drive.google.com/uc?export=download&id=15UBWzP7lWTn3cIc5X3BTWzo9PbGtbYCG",
     viewUrl: "https://drive.google.com/file/d/15UBWzP7lWTn3cIc5X3BTWzo9PbGtbYCG/view?usp=sharing"
   },
+  {
+    id: "1bvg0OE9cbL7VqL2JzIoj7DHBEpi9-ekt",
+    driveId: "1bvg0OE9cbL7VqL2JzIoj7DHBEpi9-ekt",
+    propertyName: "Tropical Beach",
+    propertyId: "tropical-beach",
+    folder: "Apresentação",
+    name: "[Tropical Beach] Apresentação lançamento.pdf",
+    aliases: ["apresentacao tropical beach", "book tropical beach", "tropical beach lançamento"],
+    title: "Apresentação de Lançamento Tropical Beach",
+    type: "pdf",
+    category: "book",
+    size: "14.9 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1bvg0OE9cbL7VqL2JzIoj7DHBEpi9-ekt",
+    viewUrl: "https://drive.google.com/file/d/1bvg0OE9cbL7VqL2JzIoj7DHBEpi9-ekt/view?usp=sharing"
+  },
+  {
+    id: "1ySgIgql8ElLHJPaWNr6wta6dTV1OEHU7",
+    driveId: "1ySgIgql8ElLHJPaWNr6wta6dTV1OEHU7",
+    propertyName: "Ocean Breeze",
+    propertyId: "ocean-breeze",
+    folder: "Apresentação",
+    name: "[WhatsApp] Apresentação Comercial_Breeze.pdf",
+    aliases: ["apresentacao ocean breeze", "book ocean breeze", "apresentacao breeze", "book breeze"],
+    title: "Apresentação Comercial Ocean Breeze",
+    type: "pdf",
+    category: "book",
+    size: "6.1 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1ySgIgql8ElLHJPaWNr6wta6dTV1OEHU7",
+    viewUrl: "https://drive.google.com/file/d/1ySgIgql8ElLHJPaWNr6wta6dTV1OEHU7/view?usp=sharing"
+  },
+  {
+    id: "1aE1dIBRdTbdCntbEzmtdDQDT8j-kXe1A",
+    driveId: "1aE1dIBRdTbdCntbEzmtdDQDT8j-kXe1A",
+    propertyName: "Coral Gables",
+    propertyId: "coral-gables",
+    folder: "Apresentação",
+    name: "Apresentação comercial Coral Gables.pdf",
+    aliases: ["apresentacao coral gables", "book coral gables", "apresentação coral gables"],
+    title: "Apresentação Comercial Coral Gables",
+    type: "pdf",
+    category: "book",
+    size: "19.5 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1aE1dIBRdTbdCntbEzmtdDQDT8j-kXe1A",
+    viewUrl: "https://drive.google.com/file/d/1aE1dIBRdTbdCntbEzmtdDQDT8j-kXe1A/view?usp=sharing"
+  },
+  {
+    id: "1MV2HDJ_hnT5WQznvLg45lVE5ePV0dvhq",
+    driveId: "1MV2HDJ_hnT5WQznvLg45lVE5ePV0dvhq",
+    propertyName: "Dolphin Bay",
+    propertyId: "dolphin-bay",
+    folder: "Apresentação",
+    name: "Dolphin Bay - Apresentação lançamento.pdf",
+    aliases: ["apresentacao dolphin bay", "book dolphin bay", "dolphin bay lançamento"],
+    title: "Apresentação Lançamento Dolphin Bay",
+    type: "pdf",
+    category: "book",
+    size: "16.1 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1MV2HDJ_hnT5WQznvLg45lVE5ePV0dvhq",
+    viewUrl: "https://drive.google.com/file/d/1MV2HDJ_hnT5WQznvLg45lVE5ePV0dvhq/view?usp=sharing"
+  },
+  {
+    id: "1Q2syk2o7pLiiEqJ2FUtpa-BSL_Zbt2s0",
+    driveId: "1Q2syk2o7pLiiEqJ2FUtpa-BSL_Zbt2s0",
+    propertyName: "Sunset Tower",
+    propertyId: "sunset-tower",
+    folder: "Apresentação",
+    name: "E-mail - Sunset Tower.pdf",
+    aliases: ["apresentacao sunset tower", "book sunset tower", "sunset tower", "sunset"],
+    title: "Apresentação Comercial Sunset Tower",
+    type: "pdf",
+    category: "book",
+    size: "7.8 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1Q2syk2o7pLiiEqJ2FUtpa-BSL_Zbt2s0",
+    viewUrl: "https://drive.google.com/file/d/1Q2syk2o7pLiiEqJ2FUtpa-BSL_Zbt2s0/view?usp=sharing"
+  },
+  {
+    id: "1i9XpA0gtqldkjvcRlY2o6tylchfhzNiG",
+    driveId: "1i9XpA0gtqldkjvcRlY2o6tylchfhzNiG",
+    propertyName: "Fort Myers",
+    propertyId: "fort-myers",
+    folder: "Apresentação",
+    name: "Fort Myers_Apresentação Lançamento (2).pdf",
+    aliases: ["apresentacao fort myers", "book fort myers", "fort myers lançamento"],
+    title: "Apresentação Lançamento Fort Myers",
+    type: "pdf",
+    category: "book",
+    size: "15.4 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1i9XpA0gtqldkjvcRlY2o6tylchfhzNiG",
+    viewUrl: "https://drive.google.com/file/d/1i9XpA0gtqldkjvcRlY2o6tylchfhzNiG/view?usp=sharing"
+  },
+  {
+    id: "1QmYO8IEL6Jh3jhZCjslQZw_Ct4bbvVsC",
+    driveId: "1QmYO8IEL6Jh3jhZCjslQZw_Ct4bbvVsC",
+    propertyName: "Royal Bay",
+    propertyId: "royal-bay",
+    folder: "Apresentação",
+    name: "Royal Bay - Apresentação lançamento.pdf",
+    aliases: ["apresentacao royal bay", "book royal bay", "apresentacao royal baby", "royal bay lançamento"],
+    title: "Apresentação Lançamento Royal Bay",
+    type: "pdf",
+    category: "book",
+    size: "20.8 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1QmYO8IEL6Jh3jhZCjslQZw_Ct4bbvVsC",
+    viewUrl: "https://drive.google.com/file/d/1QmYO8IEL6Jh3jhZCjslQZw_Ct4bbvVsC/view?usp=sharing"
+  },
+  {
+    id: "12cwcp-NpJHmJKZKtQsn08esH069rmvAQ",
+    driveId: "12cwcp-NpJHmJKZKtQsn08esH069rmvAQ",
+    propertyName: "Ocean Park",
+    propertyId: "ocean-park",
+    folder: "Apresentação",
+    name: "V2 [Ocean Park] Apresentação Comercial 05.09.pdf",
+    aliases: ["apresentacao ocean park", "book ocean park", "apresentacao the ocean", "book the ocean"],
+    title: "Apresentação Comercial Ocean Park",
+    type: "pdf",
+    category: "book",
+    size: "17.9 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=12cwcp-NpJHmJKZKtQsn08esH069rmvAQ",
+    viewUrl: "https://drive.google.com/file/d/12cwcp-NpJHmJKZKtQsn08esH069rmvAQ/view?usp=sharing"
+  },
+  {
+    id: "1TDGY_d-uVgkX7MO5eGLQpzXAnbR9IhNO",
+    driveId: "1TDGY_d-uVgkX7MO5eGLQpzXAnbR9IhNO",
+    propertyName: "Emerald Coast",
+    propertyId: "emerald",
+    folder: "Apresentação",
+    name: "Vetter_Emerald Coast_lançamento.pdf",
+    aliases: ["apresentacao emerald", "book emerald", "emerald coast", "emerald", "apresentacao esmerald"],
+    title: "Apresentação Lançamento Emerald Coast",
+    type: "pdf",
+    category: "book",
+    size: "14.2 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1TDGY_d-uVgkX7MO5eGLQpzXAnbR9IhNO",
+    viewUrl: "https://drive.google.com/file/d/1TDGY_d-uVgkX7MO5eGLQpzXAnbR9IhNO/view?usp=sharing"
+  },
+  {
+    id: "1lQnc-fAM_4InMsuiOlxyPzsWd-TVCkmR",
+    driveId: "1lQnc-fAM_4InMsuiOlxyPzsWd-TVCkmR",
+    propertyName: "Palm Springs Tower",
+    propertyId: "palm-springs",
+    folder: "Apresentação",
+    name: "WhatsApp — Palm Springs Tower.pdf",
+    aliases: ["apresentacao palm springs", "book palm springs", "palm springs", "palm"],
+    title: "Apresentação Comercial Palm Springs",
+    type: "pdf",
+    category: "book",
+    size: "6.8 MB",
+    updatedAt: "Agosto/2026",
+    url: "https://drive.google.com/uc?export=download&id=1lQnc-fAM_4InMsuiOlxyPzsWd-TVCkmR",
+    viewUrl: "https://drive.google.com/file/d/1lQnc-fAM_4InMsuiOlxyPzsWd-TVCkmR/view?usp=sharing"
+  },
 
-  // ================= TABELAS REAIS DO DRIVE =================
+  // ================= TABELAS (14 ARQUIVOS REAIS) =================
   {
     id: "1pHkZEerdFLEcVb4NbNOQevt8jG8rG9aU",
     driveId: "1pHkZEerdFLEcVb4NbNOQevt8jG8rG9aU",
     propertyName: "Bal Harbour",
     propertyId: "bal-harbour",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela Bal Harbour - Agosto 2026.pdf",
-    aliases: [
-      "bal harbour", "bal harbor", "balharbour", "tabela bal harbour", "tabela bal harbor", "tabela do bal harbour", "tabela bal", "preco bal harbour", "valores bal harbour"
-    ],
-    title: "Tabela Bal Harbour - Agosto 2026",
+    aliases: ["tabela bal harbour", "tabela bal harbor", "tabela do bal harbour", "preço bal harbour", "tabela bal"],
+    title: "Tabela Bal Harbour (Agosto 2026)",
     type: "pdf",
     category: "tabela",
     size: "2.4 MB",
@@ -65,11 +266,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1mefIwKfnLSSurolreYbPb94y3W3xUFcm",
     propertyName: "Royal Bay",
     propertyId: "royal-bay",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela Royal Bay - Agosto 2026 2.pdf",
-    aliases: [
-      "royal bay", "royal baby", "royal", "tabela royal bay", "tabela do royal bay", "tabela royal baby", "roial bay", "bay"
-    ],
+    aliases: ["tabela royal bay", "tabela royal baby", "tabela do royal bay", "royal baby", "bay"],
     title: "Tabela Royal Bay - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -83,11 +282,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1FYREgqMRpYnW2lL3soVQqe5PfSZtjH8w",
     propertyName: "Ocean Park (Torre Norte)",
     propertyId: "ocean-park-norte",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela Ocean Park Torre Norte - Agosto 2026.pdf",
-    aliases: [
-      "ocean park torre norte", "tabela ocean park torre norte", "tabela do the ocean", "the ocean", "tabela ocean", "ocean park norte", "ocean norte"
-    ],
+    aliases: ["ocean park torre norte", "tabela ocean park torre norte", "tabela do the ocean", "the ocean", "ocean norte"],
     title: "Tabela Ocean Park Torre Norte - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -101,11 +298,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1f9QZUUEusD07xfsd-P8aJ4tBrFGgjU-e",
     propertyName: "Ocean Park (Torre Sul)",
     propertyId: "ocean-park-sul",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela Ocean Park Torre Sul - Agosto 2026.pdf",
-    aliases: [
-      "ocean park torre sul", "tabela ocean park torre sul", "ocean park sul", "tabela ocean sul", "ocean sul"
-    ],
+    aliases: ["ocean park torre sul", "tabela ocean park torre sul", "ocean sul"],
     title: "Tabela Ocean Park Torre Sul - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -119,11 +314,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1DGVoSlYz750OUmS4ByAHOelVHJH7YDUt",
     propertyName: "Destin Beach",
     propertyId: "destin-beach",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Destin Beach -  Tabela de Agosto 2026.pdf",
-    aliases: [
-      "destin beach", "destin", "tabela destin beach", "tabela destin", "tabela do destin"
-    ],
+    aliases: ["destin beach", "destin", "tabela destin beach", "tabela destin", "tabela do destin"],
     title: "Tabela Destin Beach - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -137,11 +330,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1LgsixjSLf2ToxGWV-DNGtw2s2idUM50v",
     propertyName: "Blue Coast",
     propertyId: "blue-coast",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela Blue Coast - Agosto 2026.pdf",
-    aliases: [
-      "blue coast", "blue", "tabela blue coast", "tabela blue", "tabela do blue coast"
-    ],
+    aliases: ["blue coast", "blue", "tabela blue coast", "tabela do blue coast"],
     title: "Tabela Blue Coast - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -155,11 +346,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1zbEUjToRIdKFfJNSm0FbubEF11x4YORo",
     propertyName: "Coral Gables",
     propertyId: "coral-gables",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela Coral Gables - Agosto 2026.pdf",
-    aliases: [
-      "coral gables", "coral", "gables", "tabela coral gables", "tabela do coral gables"
-    ],
+    aliases: ["coral gables", "coral", "gables", "tabela coral gables", "tabela do coral gables"],
     title: "Tabela Coral Gables - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -173,11 +362,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1wqex8Z5l8iluZM4e3B3_a7qvIalRe2mr",
     propertyName: "Gold Coast",
     propertyId: "gold-coast",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela de Preço - GOLD COAST Agosto 2026.pdf",
-    aliases: [
-      "gold coast", "gold", "tabela gold coast", "tabela gold", "tabela do gold coast"
-    ],
+    aliases: ["gold coast", "gold", "tabela gold coast", "tabela do gold coast"],
     title: "Tabela de Preço - Gold Coast (Agosto 2026)",
     type: "pdf",
     category: "tabela",
@@ -189,13 +376,11 @@ export const INITIAL_DRIVE_INDEX = [
   {
     id: "1mhc6rKtEMXqqdnvxIeVMeyO7Uyulqc4Y",
     driveId: "1mhc6rKtEMXqqdnvxIeVMeyO7Uyulqc4Y",
-    propertyName: "Emerald",
+    propertyName: "Emerald Coast",
     propertyId: "emerald",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela de preços Emerald  - Agosto 2026.pdf",
-    aliases: [
-      "emerald", "esmerald", "tabela emerald", "tabela do emerald", "preços emerald"
-    ],
+    aliases: ["emerald", "emerald coast", "tabela emerald", "tabela do emerald", "esmerald"],
     title: "Tabela de Preços Emerald - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -209,11 +394,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1TpP3-WqRPvcKfpCMMEg-4ftFL9nEiHWY",
     propertyName: "Dolphin Bay",
     propertyId: "dolphin-bay",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela Dolphin Bay - Agosto 2026.pdf",
-    aliases: [
-      "dolphin bay", "dolphin", "dolfin", "tabela dolphin bay", "tabela dolphin"
-    ],
+    aliases: ["dolphin bay", "dolphin", "dolfin", "tabela dolphin bay", "tabela dolphin"],
     title: "Tabela Dolphin Bay - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -227,11 +410,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1QDhCvdntz7TiCtOG8DdGRfkes4ZS62sW",
     propertyName: "Fort Myers",
     propertyId: "fort-myers",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela Fort Myers - Agosto 2026.pdf",
-    aliases: [
-      "fort myers", "fort", "myers", "tabela fort myers", "tabela fort"
-    ],
+    aliases: ["fort myers", "fort", "myers", "tabela fort myers", "tabela do fort myers"],
     title: "Tabela Fort Myers - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -245,11 +426,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1DxK3AzPq30owVrsD-KpU4k9cBwozyqOt",
     propertyName: "Paradise",
     propertyId: "paradise",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela Paradise - Agosto 2026.pdf",
-    aliases: [
-      "paradise", "tabela paradise", "tabela do paradise"
-    ],
+    aliases: ["paradise", "tabela paradise", "tabela do paradise"],
     title: "Tabela Paradise - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -263,11 +442,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "108armNN74SUYVY__LiLOLE2xCMr64hCt",
     propertyName: "South Beach",
     propertyId: "south-beach",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela South Beach - Agosto 2026.pdf",
-    aliases: [
-      "south beach", "south", "tabela south beach", "tabela south"
-    ],
+    aliases: ["south beach", "south", "tabela south beach", "tabela do south beach"],
     title: "Tabela South Beach - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -281,11 +458,9 @@ export const INITIAL_DRIVE_INDEX = [
     driveId: "1wt5DfS3CWQw6xGWo3J4qEZLIwIw2qUti",
     propertyName: "Tropical Beach",
     propertyId: "tropical-beach",
-    folder: "The Wave / Tabela",
+    folder: "Tabela",
     name: "Tabela Tropical Beach - Agosto 2026.pdf",
-    aliases: [
-      "tropical beach", "tropical", "tabela tropical beach", "tabela tropical"
-    ],
+    aliases: ["tropical beach", "tropical", "tabela tropical beach", "tabela do tropical beach"],
     title: "Tabela Tropical Beach - Agosto 2026",
     type: "pdf",
     category: "tabela",
@@ -298,7 +473,7 @@ export const INITIAL_DRIVE_INDEX = [
 
 export function getStoredDriveIndex() {
   try {
-    const saved = localStorage.getItem('vetter_drive_index_v2');
+    const saved = localStorage.getItem('vetter_drive_index_v3');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -311,9 +486,8 @@ export function getStoredDriveIndex() {
 
 export function saveStoredDriveIndex(newIndex) {
   try {
-    localStorage.setItem('vetter_drive_index_v2', JSON.stringify(newIndex));
+    localStorage.setItem('vetter_drive_index_v3', JSON.stringify(newIndex));
   } catch (e) {
     console.warn(e);
   }
 }
-
