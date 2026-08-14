@@ -3,8 +3,6 @@ import { Building, Layers, Sparkles, FolderArchive } from 'lucide-react';
 
 export default function BottomNav({ activeTab, setActiveTab }) {
   const navItems = [
-    { id: 'catalog', label: 'Imóveis', icon: Building },
-    { id: 'floorplans', label: 'Plantas', icon: Layers },
     { id: 'assistant', label: 'Assistente IA', icon: Sparkles },
     { id: 'drive', label: 'Drive Hub', icon: FolderArchive },
   ];

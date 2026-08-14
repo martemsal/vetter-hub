@@ -12,7 +12,7 @@ import { runRealtimeDriveScanner } from './utils/driveScanner';
 import { getStoredDriveIndex } from './data/driveIndex';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('catalog'); // 'catalog' | 'floorplans' | 'assistant' | 'drive'
+  const [activeTab, setActiveTab] = useState('assistant'); // 'assistant' | 'drive'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [activePropertyModal, setActivePropertyModal] = useState(null);
