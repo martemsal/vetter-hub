@@ -297,5 +297,23 @@ export const INITIAL_DRIVE_INDEX = [
 ];
 
 export function getStoredDriveIndex() {
+  try {
+    const saved = localStorage.getItem('vetter_drive_index_v2');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {
+    console.warn(e);
+  }
   return INITIAL_DRIVE_INDEX;
 }
+
+export function saveStoredDriveIndex(newIndex) {
+  try {
+    localStorage.setItem('vetter_drive_index_v2', JSON.stringify(newIndex));
+  } catch (e) {
+    console.warn(e);
+  }
+}
+

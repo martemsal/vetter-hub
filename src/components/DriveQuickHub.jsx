@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { 
   HardDrive, ExternalLink, Table, Layers, BookOpen, 
-  FolderArchive, ArrowUpRight, ShieldCheck, Share2, Search, FileText, Download 
+  FolderArchive, ArrowUpRight, ShieldCheck, Share2, Search, FileText, Download, RefreshCw 
 } from 'lucide-react';
-import { DRIVE_ROOT_URL, getStoredDriveIndex } from '../data/driveIndex';
-import { QUICK_DRIVE_SHORTCUTS } from '../data/properties';
+import { DRIVE_ROOT_URL } from '../data/driveIndex';
 
-export default function DriveQuickHub() {
+export default function DriveQuickHub({ driveFiles, syncStatus, onRefresh }) {
   const [searchFilter, setSearchFilter] = useState('');
-  const [driveFiles] = useState(() => getStoredDriveIndex());
 
   const handleCopyLink = () => {
     navigator.clipboard?.writeText(DRIVE_ROOT_URL);
@@ -24,12 +22,23 @@ export default function DriveQuickHub() {
 
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 18, paddingBottom: 32 }}>
-      <div>
-        <span className="gold-badge">Google Drive Conectado</span>
-        <h2 style={{ fontSize: 22, marginTop: 4 }}>Acervo Oficial de Arquivos</h2>
-        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-          {driveFiles.length} arquivos indexados diretamente da pasta compartilhada do Drive.
-        </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <span className="gold-badge">Google Drive Conectado</span>
+          <h2 style={{ fontSize: 22, marginTop: 4 }}>Acervo de Arquivos</h2>
+          <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
+            {driveFiles.length} arquivos sincronizados diretamente do Drive.
+          </p>
+        </div>
+        
+        <button
+          className={`header-btn ${syncStatus === 'syncing' ? 'recording' : ''}`}
+          onClick={onRefresh}
+          disabled={syncStatus === 'syncing'}
+          title="Verificar atualizações no Drive"
+        >
+          <RefreshCw size={16} />
+        </button>
       </div>
 
       {/* Card Principal */}
@@ -65,7 +74,7 @@ export default function DriveQuickHub() {
             <h3 style={{ fontSize: 16 }}>Pasta Geral de Empreendimentos</h3>
             <div style={{ fontSize: 12, color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: 4 }}>
               <ShieldCheck size={13} />
-              <span>Sincronizado com o Google Drive</span>
+              <span>Sincronização em Tempo Real Ativa</span>
             </div>
           </div>
         </div>
@@ -103,7 +112,7 @@ export default function DriveQuickHub() {
           <Search size={16} color="var(--text-muted)" />
           <input
             type="text"
-            placeholder="Filtrar por nome de arquivo, pasta ou prédio..."
+            placeholder="Filtrar por arquivo, pasta ou empreendimento..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
           />
@@ -136,12 +145,11 @@ export default function DriveQuickHub() {
 
               <a
                 href={file.url}
-                download={file.name}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-secondary"
                 style={{ padding: '8px 10px' }}
-                title="Baixar arquivo"
+                title="Visualizar ou Baixar arquivo"
               >
                 <Download size={14} />
               </a>

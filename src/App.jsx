@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, Sparkles, Building2, Mic, MicOff, Layers, FolderArchive, Bot } from 'lucide-react';
+import { Search, Sparkles, Building2, Mic, MicOff, Layers, FolderArchive, CloudLightning, Check } from 'lucide-react';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
 import PropertyCard from './components/PropertyCard';
@@ -8,6 +8,8 @@ import FloorPlanViewer from './components/FloorPlanViewer';
 import AssistantChat from './components/AssistantChat';
 import DriveQuickHub from './components/DriveQuickHub';
 import { PROPERTIES_DATA } from './data/properties';
+import { runRealtimeDriveScanner } from './utils/driveScanner';
+import { getStoredDriveIndex } from './data/driveIndex';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('catalog'); // 'catalog' | 'floorplans' | 'assistant' | 'drive'
@@ -16,9 +18,31 @@ export default function App() {
   const [activePropertyModal, setActivePropertyModal] = useState(null);
   const [selectedPlanPropId, setSelectedPlanPropId] = useState(null);
   const [isSearchingVoice, setIsSearchingVoice] = useState(false);
+  const [driveFiles, setDriveFiles] = useState(() => getStoredDriveIndex());
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced' | 'error'
   const searchRecognitionRef = useRef(null);
 
-  // Inicialização do microfone para busca rápida por voz
+  // Gatilho de Sincronização em Tempo Real na Inicialização (Drive Scanner)
+  useEffect(() => {
+    async function initDriveSync() {
+      setSyncStatus('syncing');
+      try {
+        const freshFiles = await runRealtimeDriveScanner();
+        if (freshFiles && freshFiles.length > 0) {
+          setDriveFiles(freshFiles);
+          setSyncStatus('synced');
+        } else {
+          setSyncStatus('error');
+        }
+      } catch (err) {
+        console.error(err);
+        setSyncStatus('error');
+      }
+    }
+    initDriveSync();
+  }, []);
+
+  // Microfone para busca rápida por voz
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -95,7 +119,21 @@ export default function App() {
   return (
     <div className="app-container">
       {/* Header Fixo */}
-      <Header onOpenDriveHub={() => setActiveTab('drive')} />
+      <Header onOpenDriveHub={() => setActiveTab('drive')} syncStatus={syncStatus} />
+
+      {/* Indicador de Status da Sincronização em Tempo Real */}
+      {syncStatus === 'syncing' && (
+        <div style={{ background: 'rgba(230, 195, 92, 0.12)', borderBottom: '1px solid rgba(230, 195, 92, 0.3)', padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'var(--gold-primary)', fontWeight: 600 }}>
+          <CloudLightning size={12} className="recording" />
+          <span>Sincronizando com o Google Drive em tempo real...</span>
+        </div>
+      )}
+      {syncStatus === 'synced' && (
+        <div style={{ background: 'rgba(16, 185, 129, 0.08)', borderBottom: '1px solid rgba(16, 185, 129, 0.2)', padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--accent-emerald)', fontWeight: 600 }}>
+          <Check size={12} />
+          <span>Sincronização concluída com sucesso! ({driveFiles.length} arquivos disponíveis)</span>
+        </div>
+      )}
 
       {/* Conteúdo por Aba */}
       <main style={{ flex: 1 }}>
@@ -193,14 +231,11 @@ export default function App() {
         )}
 
         {activeTab === 'assistant' && (
-          <AssistantChat onNavigateToPlan={(propId) => {
-            setSelectedPlanPropId(propId);
-            setActiveTab('floorplans');
-          }} />
+          <AssistantChat driveFiles={driveFiles} />
         )}
 
         {activeTab === 'drive' && (
-          <DriveQuickHub />
+          <DriveQuickHub driveFiles={driveFiles} syncStatus={syncStatus} onRefresh={() => runRealtimeDriveScanner().then(setDriveFiles)} />
         )}
       </main>
 

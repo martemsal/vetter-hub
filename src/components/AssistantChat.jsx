@@ -7,8 +7,7 @@ import {
 import { getStoredDriveIndex } from '../data/driveIndex';
 import { searchDriveWithGeminiIntelligence } from '../utils/geminiDriveEngine';
 
-export default function AssistantChat() {
-  const [driveFiles] = useState(() => getStoredDriveIndex());
+export default function AssistantChat({ driveFiles }) {
   const [messages, setMessages] = useState([
     {
       id: 1,
