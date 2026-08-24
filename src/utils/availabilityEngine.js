@@ -160,6 +160,37 @@ export async function queryAvailabilityWithContext(query, lastPropertyContextId 
     };
   }
 
+  // Caso de Busca Reversa: Localizar qual unidade possui determinada vaga ou box
+  const reverseGaragemMatch = norm.match(/(?:vaga|box|garagem|garagens)\s*(\d{1,3})/i);
+  if (reverseGaragemMatch) {
+    const targetNum = reverseGaragemMatch[1];
+    // Procurar por qualquer unidade que tenha esse número no espaço complementar
+    const matchedUnit = units.find(u => {
+      const complement = u.espacoComplementar.toLowerCase();
+      // Garante correspondência precisa do número (ex: "vaga 125" ou "box 66")
+      return complement.includes(targetNum);
+    });
+
+    if (matchedUnit) {
+      return {
+        matched: true,
+        text: `🚗 **Localizador de Garagem — ${property.propertyName}**\n\n` +
+              `• O **Box/Vaga ${targetNum}** pertence ao **${matchedUnit.unit}**.\n` +
+              `• **Espaço Complementar Completo:** ${matchedUnit.espacoComplementar}\n` +
+              `• **Situação do Apartamento:** ${matchedUnit.situacao === 'Disponível' ? '🟢 Disponível' : '🔴 ' + matchedUnit.situacao}\n` +
+              `• **Valor de Tabela:** ${matchedUnit.valorTotal}\n\n` +
+              `*Busca realizada na coluna de espaço complementar da planilha oficial.*`,
+        propertyId: property.propertyId
+      };
+    } else {
+      return {
+        matched: true,
+        text: `❌ Não localizei nenhuma unidade no **${property.propertyName}** associada à Vaga/Box **${targetNum}** no espaço complementar.`,
+        propertyId: property.propertyId
+      };
+    }
+  }
+
   // Caso A: Solicitação de unidade específica (Fluxo, Vagas/Boxes ou Tamanho/Área)
   const unitMatch = norm.match(/(?:unidade|apto|apto\.|apartamento)?\s*(\d{3,4})/i);
   if (unitMatch) {
@@ -213,50 +244,6 @@ export async function queryAvailabilityWithContext(query, lastPropertyContextId 
       return {
         matched: true,
         text: `❌ A unidade **${targetUnitNum}** não foi localizada na planilha do **${property.propertyName}**.`,
-        propertyId: property.propertyId
-      };
-    }
-  }
-
-  // Caso D: Busca reversa por Vaga ou Box específico (Ex: "quem tem a vaga 125" ou "qual apto tem o box 66")
-  const specGaragemMatch = norm.match(/(vaga|box|garagem|vaga de garagem)\s*(\d{1,3})/i);
-  if (specGaragemMatch) {
-    const typeLabel = specGaragemMatch[1]; // vaga, box, etc.
-    const searchNum = specGaragemMatch[2]; // 125, 66, etc.
-    const searchTerm = `${typeLabel} ${searchNum}`.toLowerCase();
-    
-    // Filtra todas as unidades que contêm a vaga/box no espaço complementar
-    const matchingUnits = units.filter(u => 
-      u.espacoComplementar && u.espacoComplementar.toLowerCase().includes(searchTerm)
-    );
-    
-    if (matchingUnits.length > 0) {
-      const listStr = matchingUnits.map(u => `• **${u.unit}** — Possui: *${u.espacoComplementar}* (Status: ${u.situacao === 'Disponível' ? '🟢 Disponível' : '🔴 ' + u.situacao})`).join('\n');
-      return {
-        matched: true,
-        text: `🔍 **Localizador de Vagas/Boxes — ${property.propertyName}**\n\n` +
-              `Achei a referência para **"${typeLabel} ${searchNum}"** nas seguintes unidades:\n\n${listStr}\n\n` +
-              `*Dados consultados em tempo real na planilha de espaço complementar.*`,
-        propertyId: property.propertyId
-      };
-    } else {
-      // Se não encontrou pelo termo completo "vaga 125", tenta buscar apenas pelo número dentro do espaço complementar
-      const matchingUnitsByNum = units.filter(u => 
-        u.espacoComplementar && u.espacoComplementar.toLowerCase().includes(searchNum)
-      );
-      if (matchingUnitsByNum.length > 0) {
-        const listStr = matchingUnitsByNum.map(u => `• **${u.unit}** — Possui: *${u.espacoComplementar}*`).join('\n');
-        return {
-          matched: true,
-          text: `🔍 **Localizador de Vagas/Boxes — ${property.propertyName}**\n\n` +
-                `Não achei a correspondência exata para "${typeLabel} ${searchNum}", mas localizei o número **${searchNum}** nestas unidades:\n\n${listStr}`,
-          propertyId: property.propertyId
-        };
-      }
-      
-      return {
-        matched: true,
-        text: `🔴 Nenhuma unidade no **${property.propertyName}** possui a **${typeLabel} ${searchNum}** mapeada no espaço complementar.`,
         propertyId: property.propertyId
       };
     }
