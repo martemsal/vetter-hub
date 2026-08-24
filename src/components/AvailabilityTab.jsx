@@ -22,7 +22,6 @@ export default function AvailabilityTab() {
   // Carrega os dados de unidades do cache/Drive ao mudar o empreendimento
   useEffect(() => {
     async function loadData() {
-      setLoading(true);
       const data = await getPropertyAvailability(selectedPropertyId);
       setRawUnits(data);
       // Carrega inicialmente mostrando todos os disponíveis
@@ -31,7 +30,6 @@ export default function AvailabilityTab() {
       setFilterFinal('all');
       setFilterStatus('Disponível'); // Mostra os disponíveis de início
       setExpandedUnit(null);
-      setLoading(false);
     }
     loadData();
   }, [selectedPropertyId]);

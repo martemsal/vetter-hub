@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { getStoredDriveIndex } from '../data/driveIndex';
 import { searchDriveWithGeminiIntelligence } from '../utils/geminiDriveEngine';
-import { queryAvailabilityIntelligence } from '../utils/availabilityEngine';
+import { queryAvailabilityWithContext } from '../utils/availabilityEngine';
 
 
 export default function AssistantChat({ driveFiles }) {
@@ -22,6 +22,7 @@ export default function AssistantChat({ driveFiles }) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessingVoice, setIsProcessingVoice] = useState(false);
   const [speakingMsgId, setSpeakingMsgId] = useState(null);
+  const [lastPropertyContextId, setLastPropertyContextId] = useState(null);
   
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
@@ -166,8 +167,11 @@ export default function AssistantChat({ driveFiles }) {
       
       // 1. Verificar se a pergunta refere-se à disponibilidade ou fluxos de pagamentos
       try {
-        const availResult = await queryAvailabilityIntelligence(query);
+        const availResult = await queryAvailabilityWithContext(query, lastPropertyContextId);
         if (availResult.matched) {
+          if (availResult.propertyId) {
+            setLastPropertyContextId(availResult.propertyId);
+          }
           const assistantMsg = {
             id: newMsgId,
             sender: 'assistant',
