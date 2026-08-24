@@ -9,29 +9,53 @@ import { getPropertyAvailability } from '../utils/availabilityEngine';
 export default function AvailabilityTab() {
   const [properties] = useState(() => getAvailabilityFiles());
   const [selectedPropertyId, setSelectedPropertyId] = useState('bal-harbour');
-  const [units, setUnits] = useState([]);
-  const [searchFilter, setSearchFilter] = useState('');
-  const [selectedFinal, setSelectedFinal] = useState('all');
+  const [rawUnits, setRawUnits] = useState([]);
+  const [displayUnits, setDisplayUnits] = useState([]);
+  
+  // Filtros locais (atualizados pelos controles)
+  const [filterFinal, setFilterFinal] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
+  
   const [loading, setLoading] = useState(false);
   const [expandedUnit, setExpandedUnit] = useState(null);
 
+  // Carrega os dados de unidades do cache/Drive ao mudar o empreendimento
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       const data = await getPropertyAvailability(selectedPropertyId);
-      setUnits(data);
+      setRawUnits(data);
+      // Carrega inicialmente mostrando todos os disponíveis
+      const initialDisplay = data.filter(u => u.situacao === 'Disponível');
+      setDisplayUnits(initialDisplay);
+      setFilterFinal('all');
+      setFilterStatus('Disponível'); // Mostra os disponíveis de início
+      setExpandedUnit(null);
       setLoading(false);
     }
     loadData();
   }, [selectedPropertyId]);
 
-  const filteredUnits = units.filter(u => {
-    const matchesSearch = u.unit.toLowerCase().includes(searchFilter.toLowerCase()) || 
-                          u.situacao.toLowerCase().includes(searchFilter.toLowerCase());
+  // Função disparada ao clicar no botão "Buscar"
+  const handleSearch = () => {
+    setLoading(true);
+    setExpandedUnit(null);
     
-    if (selectedFinal === 'all') return matchesSearch;
-    return matchesSearch && u.final === selectedFinal;
-  });
+    setTimeout(() => {
+      const results = rawUnits.filter(u => {
+        // Filtro por Final
+        const matchesFinal = filterFinal === 'all' || u.final === filterFinal;
+        
+        // Filtro por Status
+        const matchesStatus = filterStatus === 'all' || u.situacao === filterStatus;
+        
+        return matchesFinal && matchesStatus;
+      });
+      
+      setDisplayUnits(results);
+      setLoading(false);
+    }, 150);
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -68,7 +92,7 @@ export default function AvailabilityTab() {
         <span className="gold-badge">Tabela de Vendas Integrada</span>
         <h2 style={{ fontSize: 22, marginTop: 4 }}>Disponibilidade & Fluxo</h2>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-          Consulte o status e as condições de pagamento das unidades em tempo real.
+          Selecione os parâmetros e clique em **Buscar** para carregar as unidades oficiais.
         </p>
       </div>
 
@@ -83,10 +107,7 @@ export default function AvailabilityTab() {
             return (
               <button
                 key={p.propertyId}
-                onClick={() => {
-                  setSelectedPropertyId(p.propertyId);
-                  setExpandedUnit(null);
-                }}
+                onClick={() => setSelectedPropertyId(p.propertyId)}
                 className={`filter-chip ${isSelected ? 'active' : ''}`}
                 style={{ flexShrink: 0 }}
               >
@@ -97,29 +118,21 @@ export default function AvailabilityTab() {
         </div>
       </div>
 
-      {/* Filtros e Busca de Unidade */}
-      <div style={{ display: 'flex', gap: 8 }}>
-        <div className="search-input-box" style={{ flex: 1 }}>
-          <Search size={16} color="var(--text-muted)" />
-          <input
-            type="text"
-            placeholder="Ex: Apto 601, Disponível..."
-            value={searchFilter}
-            onChange={(e) => setSearchFilter(e.target.value)}
-          />
-        </div>
-
-        {/* Dropdown de Finais */}
+      {/* Layout de Filtros: Finais à Esquerda, Status ao lado, Botão Buscar à Direita */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        {/* Seletor de Finais */}
         <select
-          value={selectedFinal}
-          onChange={(e) => setSelectedFinal(e.target.value)}
+          value={filterFinal}
+          onChange={(e) => setFilterFinal(e.target.value)}
           style={{
+            flex: 1,
             background: 'var(--bg-card)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',
-            padding: '0 12px',
+            padding: '10px 12px',
             color: 'var(--text-primary)',
-            fontSize: 13
+            fontSize: 13,
+            outline: 'none'
           }}
         >
           <option value="all">Todos Finais</option>
@@ -128,18 +141,55 @@ export default function AvailabilityTab() {
           <option value="03">Final 03</option>
           <option value="04">Final 04</option>
         </select>
+
+        {/* Seletor de Status */}
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          style={{
+            flex: 1,
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            padding: '10px 12px',
+            color: 'var(--text-primary)',
+            fontSize: 13,
+            outline: 'none'
+          }}
+        >
+          <option value="all">Todos Status</option>
+          <option value="Disponível">🟢 Disponíveis</option>
+          <option value="Vendida">🔴 Vendidas</option>
+          <option value="Bloqueada">🟡 Bloqueadas</option>
+        </select>
+
+        {/* Botão Buscar */}
+        <button
+          className="btn-primary"
+          onClick={handleSearch}
+          style={{
+            padding: '10px 16px',
+            whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6
+          }}
+        >
+          <Search size={15} />
+          <span>Buscar</span>
+        </button>
       </div>
 
       {/* Listagem de Unidades */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-secondary)' }}>
           <RefreshCw size={32} className="recording" style={{ margin: '0 auto 12px' }} />
-          <p>Carregando unidades e fluxos de pagamentos...</p>
+          <p>Carregando unidades da planilha...</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {filteredUnits.length > 0 ? (
-            filteredUnits.map((u) => {
+          {displayUnits.length > 0 ? (
+            displayUnits.map((u) => {
               const isExpanded = expandedUnit === u.unit;
               return (
                 <div 
@@ -230,7 +280,18 @@ export default function AvailabilityTab() {
           ) : (
             <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-secondary)' }}>
               <FileSpreadsheet size={32} color="var(--text-muted)" style={{ margin: '0 auto 12px' }} />
-              <p>Nenhuma unidade localizada para "{searchFilter}".</p>
+              <p>Nenhuma unidade localizada para os filtros selecionados.</p>
+              <button 
+                className="btn-secondary" 
+                onClick={() => {
+                  setFilterFinal('all');
+                  setFilterStatus('all');
+                  setDisplayUnits(rawUnits);
+                }}
+                style={{ margin: '12px auto 0' }}
+              >
+                Limpar Filtros
+              </button>
             </div>
           )}
         </div>
