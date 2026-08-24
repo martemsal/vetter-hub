@@ -160,13 +160,43 @@ export async function queryAvailabilityWithContext(query, lastPropertyContextId 
     };
   }
 
-  // Caso A: Solicitação de Fluxo de Pagamento de unidade específica (Ex: "fluxo da 801" ou "Sim da 801")
+  // Caso A: Solicitação de unidade específica (Fluxo, Vagas/Boxes ou Tamanho/Área)
   const unitMatch = norm.match(/(?:unidade|apto|apto\.|apartamento)?\s*(\d{3,4})/i);
   if (unitMatch) {
     const targetUnitNum = unitMatch[1];
     const unitData = units.find(u => u.unitNumber === targetUnitNum);
     
     if (unitData) {
+      // 1. Pergunta sobre Vaga, Box ou Garagem (Espaço Complementar)
+      const isGaragemQuery = norm.includes('vaga') || norm.includes('box') || norm.includes('garagem') || norm.includes('garagens') || norm.includes('complemento') || norm.includes('estacionamento');
+      if (isGaragemQuery) {
+        return {
+          matched: true,
+          text: `🚗 **Vagas e Boxes — ${property.propertyName} (${unitData.unit})**\n\n` +
+                `• **Espaço Complementar:** ${unitData.espacoComplementar || 'Nenhuma vaga ou box mapeado nesta unidade.'}\n` +
+                `• **Situação da Unidade:** ${unitData.situacao === 'Disponível' ? '🟢 Disponível' : '🔴 ' + unitData.situacao}\n` +
+                `• **Valor de Tabela:** ${unitData.valorTotal}\n\n` +
+                `*Informações de garagem extraídas diretamente do arquivo oficial de vendas.*`,
+          propertyId: property.propertyId
+        };
+      }
+
+      // 2. Pergunta sobre Tamanho, Área, Metragem ou m²
+      const isAreaQuery = norm.includes('tamanho') || norm.includes('area') || norm.includes('área') || norm.includes('m2') || norm.includes('m²') || norm.includes('metros') || norm.includes('metragem') || norm.includes('privativa') || norm.includes('total');
+      if (isAreaQuery) {
+        return {
+          matched: true,
+          text: `📐 **Área e Tamanho — ${property.propertyName} (${unitData.unit})**\n\n` +
+                `• **Área Privativa:** ${unitData.areaPrivativa || 'Sob consulta'}\n` +
+                `• **Área Total:** ${unitData.areaTotal || 'Sob consulta'}\n` +
+                `• **Situação da Unidade:** ${unitData.situacao === 'Disponível' ? '🟢 Disponível' : '🔴 ' + unitData.situacao}\n` +
+                `• **Valor de Tabela:** ${unitData.valorTotal}\n\n` +
+                `*Informações de metragem extraídas diretamente da planilha de engenharia.*`,
+          propertyId: property.propertyId
+        };
+      }
+
+      // 3. Resposta Padrão: Fluxo de Pagamento da Unidade
       return {
         matched: true,
         text: `💰 **Fluxo de Pagamento — ${property.propertyName} (${unitData.unit})**\n\n` +
