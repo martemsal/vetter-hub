@@ -4,6 +4,7 @@ import { Building, Layers, Sparkles, FolderArchive, Calendar } from 'lucide-reac
 export default function BottomNav({ activeTab, setActiveTab }) {
   const navItems = [
     { id: 'assistant', label: 'Assistente IA', icon: Sparkles },
+    { id: 'availability', label: 'Disponibilidade', icon: Building },
     { id: 'drive', label: 'Drive Hub', icon: FolderArchive },
     { id: 'duty', label: 'Plantão', icon: Calendar },
   ];

@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { getStoredDriveIndex } from '../data/driveIndex';
 import { searchDriveWithGeminiIntelligence } from '../utils/geminiDriveEngine';
+import { queryAvailabilityIntelligence } from '../utils/availabilityEngine';
+
 
 export default function AssistantChat({ driveFiles }) {
   const [messages, setMessages] = useState([
@@ -159,11 +161,31 @@ export default function AssistantChat({ driveFiles }) {
     latestTranscriptRef.current = '';
     setIsProcessingVoice(false);
 
-    setTimeout(() => {
-      // Motor de Busca Inteligente estilo Gemini Drive
-      const searchResult = searchDriveWithGeminiIntelligence(query, driveFiles);
+    setTimeout(async () => {
       const newMsgId = Date.now() + 1;
+      
+      // 1. Verificar se a pergunta refere-se à disponibilidade ou fluxos de pagamentos
+      try {
+        const availResult = await queryAvailabilityIntelligence(query);
+        if (availResult.matched) {
+          const assistantMsg = {
+            id: newMsgId,
+            sender: 'assistant',
+            text: availResult.text,
+            files: []
+          };
+          setMessages((prev) => [...prev, assistantMsg]);
+          if (wasVoice) {
+            speakText("Aqui estão as informações de disponibilidade do empreendimento.", newMsgId);
+          }
+          return;
+        }
+      } catch (err) {
+        console.warn(err);
+      }
 
+      // 2. Fallback: Busca de arquivos no Google Drive
+      const searchResult = searchDriveWithGeminiIntelligence(query, driveFiles);
       if (searchResult.status === 'found' && searchResult.file) {
         const assistantMsg = {
           id: newMsgId,

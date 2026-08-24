@@ -11,6 +11,7 @@ import { PROPERTIES_DATA } from './data/properties';
 import { runRealtimeDriveScanner } from './utils/driveScanner';
 import { getStoredDriveIndex } from './data/driveIndex';
 import DutyTab from './components/DutyTab';
+import AvailabilityTab from './components/AvailabilityTab';
 
 
 export default function App() {
@@ -242,6 +243,10 @@ export default function App() {
 
         {activeTab === 'duty' && (
           <DutyTab />
+        )}
+
+        {activeTab === 'availability' && (
+          <AvailabilityTab />
         )}
       </main>
 
