@@ -218,6 +218,50 @@ export async function queryAvailabilityWithContext(query, lastPropertyContextId 
     }
   }
 
+  // Caso D: Busca reversa por Vaga ou Box específico (Ex: "quem tem a vaga 125" ou "qual apto tem o box 66")
+  const specGaragemMatch = norm.match(/(vaga|box|garagem|vaga de garagem)\s*(\d{1,3})/i);
+  if (specGaragemMatch) {
+    const typeLabel = specGaragemMatch[1]; // vaga, box, etc.
+    const searchNum = specGaragemMatch[2]; // 125, 66, etc.
+    const searchTerm = `${typeLabel} ${searchNum}`.toLowerCase();
+    
+    // Filtra todas as unidades que contêm a vaga/box no espaço complementar
+    const matchingUnits = units.filter(u => 
+      u.espacoComplementar && u.espacoComplementar.toLowerCase().includes(searchTerm)
+    );
+    
+    if (matchingUnits.length > 0) {
+      const listStr = matchingUnits.map(u => `• **${u.unit}** — Possui: *${u.espacoComplementar}* (Status: ${u.situacao === 'Disponível' ? '🟢 Disponível' : '🔴 ' + u.situacao})`).join('\n');
+      return {
+        matched: true,
+        text: `🔍 **Localizador de Vagas/Boxes — ${property.propertyName}**\n\n` +
+              `Achei a referência para **"${typeLabel} ${searchNum}"** nas seguintes unidades:\n\n${listStr}\n\n` +
+              `*Dados consultados em tempo real na planilha de espaço complementar.*`,
+        propertyId: property.propertyId
+      };
+    } else {
+      // Se não encontrou pelo termo completo "vaga 125", tenta buscar apenas pelo número dentro do espaço complementar
+      const matchingUnitsByNum = units.filter(u => 
+        u.espacoComplementar && u.espacoComplementar.toLowerCase().includes(searchNum)
+      );
+      if (matchingUnitsByNum.length > 0) {
+        const listStr = matchingUnitsByNum.map(u => `• **${u.unit}** — Possui: *${u.espacoComplementar}*`).join('\n');
+        return {
+          matched: true,
+          text: `🔍 **Localizador de Vagas/Boxes — ${property.propertyName}**\n\n` +
+                `Não achei a correspondência exata para "${typeLabel} ${searchNum}", mas localizei o número **${searchNum}** nestas unidades:\n\n${listStr}`,
+          propertyId: property.propertyId
+        };
+      }
+      
+      return {
+        matched: true,
+        text: `🔴 Nenhuma unidade no **${property.propertyName}** possui a **${typeLabel} ${searchNum}** mapeada no espaço complementar.`,
+        propertyId: property.propertyId
+      };
+    }
+  }
+
   // Caso B: Solicitação de unidades de determinado final (Ex: "final 1" ou "final 01")
   const finalMatch = norm.match(/final\s*(\d{1,2})/i);
   if (finalMatch) {
