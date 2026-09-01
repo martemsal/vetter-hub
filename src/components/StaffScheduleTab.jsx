@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Users, Building, ShieldCheck, CheckCircle2, UserCheck, 
-  ChevronRight, FileSpreadsheet, Edit3, Save, Briefcase, Calendar 
+  ChevronRight, FileSpreadsheet, Edit3, Save, Briefcase, Calendar, Coffee, Clock 
 } from 'lucide-react';
 import { getStoredStaffSchedule, saveStoredStaffSchedule } from '../data/staffSchedule';
 
@@ -14,7 +14,7 @@ export default function StaffScheduleTab() {
   });
   
   const [selectedSector, setSelectedSector] = useState(() => {
-    return scheduleData.sectors && scheduleData.sectors.length > 0 ? scheduleData.sectors[0].id : 'atendimento';
+    return scheduleData.sectors && scheduleData.sectors.length > 0 ? scheduleData.sectors[0].id : 'todos';
   });
   
   const [isEditing, setIsEditing] = useState(false);
@@ -23,116 +23,172 @@ export default function StaffScheduleTab() {
   // Encontra a escala para o dia selecionado
   const currentDayScale = scheduleData.scale.find(s => s.day === selectedDay) || scheduleData.scale[0] || {
     day: "1",
-    dayOfWeek: "Dia",
+    dayOfWeek: "Terça-feira",
     dateStr: "01/09/2026",
     shifts: {}
   };
-
-  const currentSectorObj = scheduleData.sectors.find(s => s.id === selectedSector) || scheduleData.sectors[0];
-  const assignedStaff = currentDayScale.shifts ? currentDayScale.shifts[selectedSector] : 'Não escalado';
 
   const handleDaySelect = (day) => {
     setSelectedDay(day);
   };
 
-  const handleImportCSV = () => {
+  // Parser avançado específico para o modelo de cabeçalho da Vetter:
+  // [Folga] \t [Setor] \t [Colaborador] \t [01/09/2026] \t [02/09/2026] ...
+  const handleImportExcelVetter = () => {
     if (!rawTextImport.trim()) return;
 
     try {
-      const lines = rawTextImport.trim().split('\n');
-      if (lines.length === 0) return;
+      const rawLines = rawTextImport.trim().split('\n');
+      if (rawLines.length < 2) return;
 
-      // Se a primeira linha tiver os nomes dos setores
-      const firstLineParts = lines[0].split('\t');
-      let sectors = scheduleData.sectors;
-      let startRow = 0;
-
-      // Se a primeira linha começar com "Dia" ou "Data", podemos extrair os setores das colunas
-      if (firstLineParts[0].toLowerCase().includes('dia') || firstLineParts[0].toLowerCase().includes('data')) {
-        const customSectors = [];
-        for (let j = 2; j < firstLineParts.length; j++) {
-          const secName = firstLineParts[j].trim();
-          if (secName) {
-            customSectors.push({
-              id: `sec-${j}-${secName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
-              label: secName
-            });
-          }
-        }
-        if (customSectors.length > 0) {
-          sectors = customSectors;
-        }
-        startRow = 1;
-      }
-
-      const parsedScale = [];
-
-      for (let i = startRow; i < lines.length; i++) {
-        const parts = lines[i].split('\t');
-        if (parts.length >= 3) {
-          const dateStr = parts[0].trim();
-          const dayOfWeek = parts[1] ? parts[1].trim() : '';
-          
-          const dayMatch = dateStr.match(/^(\d+)/);
-          const day = dayMatch ? dayMatch[1] : String(i + 1);
-          
-          const shifts = {};
-          for (let col = 2; col < parts.length; col++) {
-            const sectorIdx = col - 2;
-            if (sectorIdx < sectors.length) {
-              shifts[sectors[sectorIdx].id] = parts[col].trim();
-            }
-          }
-
-          parsedScale.push({
-            day,
-            dayOfWeek: dayOfWeek || 'Dia',
-            dateStr,
-            shifts
-          });
+      // Localizar a linha de cabeçalho com as datas
+      let headerRowIndex = -1;
+      for (let i = 0; i < rawLines.length; i++) {
+        if (rawLines[i].includes('Setor') && rawLines[i].includes('Colaborador')) {
+          headerRowIndex = i;
+          break;
         }
       }
 
-      if (parsedScale.length > 0) {
-        const newScheduleData = {
-          month: scheduleData.month || "Mês Atual",
-          year: "2026",
-          sectors,
-          scale: parsedScale
+      if (headerRowIndex === -1) {
+        headerRowIndex = 0;
+      }
+
+      const headerCols = rawLines[headerRowIndex].split('\t');
+      
+      // As datas começam após as colunas Folga (0), Setor (1), Colaborador (2)
+      // Ou seja, a partir do índice 3 (ou 2 se não tiver Folga)
+      let dateStartIndex = 3;
+      if (!headerCols[0].toLowerCase().includes('folga')) {
+        dateStartIndex = 2;
+      }
+
+      const daysList = [];
+      for (let col = dateStartIndex; col < headerCols.length; col++) {
+        const colHeader = headerCols[col].trim();
+        if (!colHeader) continue;
+        
+        // Tenta achar data no formato DD/MM/AAAA ou DD/MM
+        const dateMatch = colHeader.match(/(\d{1,2})\/(\d{1,2})/);
+        const dayNum = dateMatch ? String(parseInt(dateMatch[1], 10)) : String(col - dateStartIndex + 1);
+        
+        daysList.push({
+          colIndex: col,
+          day: dayNum,
+          dateStr: colHeader
+        });
+      }
+
+      // Processar as linhas dos colaboradores
+      const sectorsMap = new Map();
+      const collaborators = [];
+
+      for (let r = headerRowIndex + 1; r < rawLines.length; r++) {
+        const rowCols = rawLines[r].split('\t');
+        if (rowCols.length < 3) continue;
+
+        let folga = "";
+        let sectorName = "";
+        let staffName = "";
+
+        if (dateStartIndex === 3) {
+          folga = rowCols[0] ? rowCols[0].trim() : "";
+          sectorName = rowCols[1] ? rowCols[1].trim() : "Geral";
+          staffName = rowCols[2] ? rowCols[2].trim() : "";
+        } else {
+          sectorName = rowCols[0] ? rowCols[0].trim() : "Geral";
+          staffName = rowCols[1] ? rowCols[1].trim() : "";
+        }
+
+        if (!staffName) continue;
+
+        const sectorId = sectorName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        if (!sectorsMap.has(sectorId)) {
+          sectorsMap.set(sectorId, { id: sectorId, label: sectorName });
+        }
+
+        const scheduleByDay = {};
+        daysList.forEach(d => {
+          const status = rowCols[d.colIndex] ? rowCols[d.colIndex].trim() : "";
+          scheduleByDay[d.day] = status;
+        });
+
+        collaborators.push({
+          name: staffName,
+          sectorId,
+          sectorName,
+          folga,
+          scheduleByDay
+        });
+      }
+
+      // Reconstruir scale por dia
+      const newScale = daysList.map(d => {
+        const shifts = {};
+        collaborators.forEach(c => {
+          // Se o colaborador trabalha ou tem status nesse dia
+          const dayStatus = c.scheduleByDay[d.day];
+          if (dayStatus) {
+            shifts[c.sectorId] = shifts[c.sectorId] ? `${shifts[c.sectorId]}, ${c.name} (${dayStatus})` : `${c.name} (${dayStatus})`;
+          } else {
+            shifts[c.sectorId] = shifts[c.sectorId] || c.name;
+          }
+        });
+
+        return {
+          day: d.day,
+          dayOfWeek: "Dia",
+          dateStr: d.dateStr,
+          shifts
         };
-        setScheduleData(newScheduleData);
-        saveStoredStaffSchedule(newScheduleData);
-        if (sectors.length > 0) {
-          setSelectedSector(sectors[0].id);
-        }
-        setIsEditing(false);
-        setRawTextImport('');
-        alert('Escala de colaboradores importada e atualizada com sucesso!');
-      } else {
-        alert('Nenhuma linha válida encontrada. Certifique-se de copiar as colunas do Excel.');
+      });
+
+      const sectorsArray = Array.from(sectorsMap.values());
+      if (sectorsArray.length === 0) {
+        sectorsArray.push({ id: "geral", label: "Administrativo & Comercial" });
       }
+
+      const updatedSchedule = {
+        month: "Setembro",
+        year: "2026",
+        sectors: sectorsArray,
+        scale: newScale.length > 0 ? newScale : scheduleData.scale,
+        collaborators
+      };
+
+      setScheduleData(updatedSchedule);
+      saveStoredStaffSchedule(updatedSchedule);
+      if (sectorsArray.length > 0) {
+        setSelectedSector(sectorsArray[0].id);
+      }
+      setIsEditing(false);
+      setRawTextImport('');
+      alert('Escala importada e organizada com sucesso!');
     } catch (e) {
       console.error(e);
-      alert('Erro ao processar os dados do Excel. Verifique a formatação.');
+      alert('Erro ao processar as colunas do Excel. Verifique se copiou a tabela completa.');
     }
   };
+
+  const currentSectorObj = scheduleData.sectors.find(s => s.id === selectedSector) || scheduleData.sectors[0];
+  const assignedStaff = currentDayScale.shifts ? currentDayScale.shifts[selectedSector] : 'Não escalado';
 
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 18, paddingBottom: 40 }}>
       {/* Header da Aba */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <span className="gold-badge">Gestão de Equipe</span>
-          <h2 style={{ fontSize: 22, marginTop: 4 }}>Escala de Colaboradores</h2>
+          <span className="gold-badge">Escala de Trabalho</span>
+          <h2 style={{ fontSize: 22, marginTop: 4 }}>Administrativo & Comercial</h2>
           <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-            Acompanhe a escala por setor, colaborador e data.
+            Consulte o setor, colaborador, plantões e folgas.
           </p>
         </div>
 
         <button
           className="header-btn"
           onClick={() => setIsEditing(!isEditing)}
-          title="Editar ou colar nova escala do Excel"
+          title="Colar planilha do Excel"
         >
           <Edit3 size={16} />
         </button>
@@ -153,18 +209,18 @@ export default function StaffScheduleTab() {
         >
           <h3 style={{ fontSize: 15, display: 'flex', alignItems: 'center', gap: 6 }}>
             <FileSpreadsheet size={18} color="var(--gold-primary)" />
-            <span>Alimentar Escala via Excel</span>
+            <span>Importar Planilha do Excel</span>
           </h3>
           <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            Selecione a tabela na sua planilha do Excel (com colunas de Data, Dia da Semana e os Setores), copie (Ctrl+C) e cole na caixa abaixo:
+            Selecione no Excel desde o cabeçalho (<strong>Folga, Setor, Colaborador, Datas...</strong>) até as linhas dos colaboradores, copie (Ctrl+C) e cole abaixo:
           </p>
           <textarea
-            placeholder="Cole aqui as células copiadas do Excel (Ctrl+V)..."
+            placeholder="Cole aqui os dados copiados do Excel (Ctrl+V)..."
             value={rawTextImport}
             onChange={(e) => setRawTextImport(e.target.value)}
             style={{
               width: '100%',
-              height: 120,
+              height: 130,
               background: '#020617',
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
@@ -175,9 +231,9 @@ export default function StaffScheduleTab() {
             }}
           />
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn-primary" onClick={handleImportCSV} style={{ flex: 1 }}>
+            <button className="btn-primary" onClick={handleImportExcelVetter} style={{ flex: 1 }}>
               <Save size={14} />
-              <span>Importar Escala</span>
+              <span>Processar & Salvar</span>
             </button>
             <button className="btn-secondary" onClick={() => setIsEditing(false)}>
               Cancelar
@@ -191,7 +247,7 @@ export default function StaffScheduleTab() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
             <Calendar size={14} />
-            <span>Data & Dia ({scheduleData.month} / {scheduleData.year})</span>
+            <span>Data da Escala ({scheduleData.month} / {scheduleData.year})</span>
           </h4>
         </div>
         
@@ -245,7 +301,7 @@ export default function StaffScheduleTab() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
           <Briefcase size={14} />
-          <span>Setor / Departamento</span>
+          <span>Setor / Área</span>
         </h4>
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
           {scheduleData.sectors.map((sec) => {
@@ -294,14 +350,14 @@ export default function StaffScheduleTab() {
             fontWeight: 800
           }}
         >
-          {assignedStaff ? assignedStaff.substring(0, 2).toUpperCase() : 'EC'}
+          {assignedStaff ? assignedStaff.substring(0, 2).toUpperCase() : 'ET'}
         </div>
 
         <div>
           <span className="gold-gradient-text" style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             {currentSectorObj?.label}
           </span>
-          <h3 style={{ fontSize: 24, fontWeight: 800, marginTop: 4 }}>
+          <h3 style={{ fontSize: 22, fontWeight: 800, marginTop: 4 }}>
             {assignedStaff || 'Ninguém escalado'}
           </h3>
           <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
@@ -324,7 +380,7 @@ export default function StaffScheduleTab() {
           }}
         >
           <CheckCircle2 size={14} />
-          <span>Colaborador Confirmado na Escala</span>
+          <span>Escala Confirmada</span>
         </div>
       </div>
 
