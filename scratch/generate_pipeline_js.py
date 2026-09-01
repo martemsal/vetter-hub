@@ -23,7 +23,6 @@ def format_currency(num):
     if not num: return "Sob consulta"
     return f"R$ {num:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
 
-# Mapa de normalização de IDs de empreendimento
 def make_prop_id(name):
     return name.lower().replace(' ', '-').replace('á', 'a').replace('ã', 'a').replace('é', 'e').replace('ó', 'o').replace('í', 'i')
 
@@ -34,6 +33,11 @@ with open('scratch/pipeline.csv', 'r', encoding='latin-1') as f:
     for row in reader:
         if len(row) >= 6:
             emp = row[0].strip()
+            
+            # REGRA: Desconsiderar tudo que for referente ao Destin
+            if 'destin' in emp.lower():
+                continue
+
             unidade = row[1].strip()
             tipo = row[2].strip()
             area = row[3].strip()
@@ -90,8 +94,8 @@ for pid, pdata in sorted(units_by_property.items(), key=lambda x: x[1]['property
         'availableCount': sum(1 for u in pdata['units'] if u['situacao'] == 'Disponível')
     })
 
-js_code = f"""// Pipeline Oficial de VGV e Disponibilidade Vetter
-// Processado a partir do arquivo 'Pipeline(-).csv' com 1953 unidades e 22 empreendimentos.
+js_code = f"""// Pipeline Oficial de VGV e Disponibilidade Vetter (Sem Destin Beach)
+// Processado a partir do arquivo 'Pipeline(-).csv' com {len(all_units)} unidades e {len(properties_list)} empreendimentos.
 
 export const PIPELINE_PROPERTIES = {json.dumps(properties_list, ensure_ascii=False, indent=2)};
 
@@ -103,4 +107,4 @@ export const ALL_PIPELINE_UNITS = {json.dumps(all_units, ensure_ascii=False, ind
 with open('src/data/pipelineData.js', 'w', encoding='utf-8') as f:
     f.write(js_code)
 
-print(f"Generated src/data/pipelineData.js with {len(all_units)} units and {len(properties_list)} properties!")
+print(f"Generated src/data/pipelineData.js with {len(all_units)} units across {len(properties_list)} properties (excluding Destin)!")
