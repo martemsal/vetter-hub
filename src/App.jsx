@@ -13,9 +13,15 @@ import { getStoredDriveIndex } from './data/driveIndex';
 import DutyTab from './components/DutyTab';
 import AvailabilityTab from './components/AvailabilityTab';
 import StaffScheduleTab from './components/StaffScheduleTab';
+import AdminUploadHub from './components/AdminUploadHub';
 
 
 export default function App() {
+  const [isAdmin, setIsAdmin] = useState(() => {
+    const path = window.location.pathname;
+    const search = window.location.search;
+    return path.includes('/admin') || search.includes('admin=true') || search.includes('view=admin');
+  });
   const [activeTab, setActiveTab] = useState('assistant'); // 'assistant' | 'drive'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
@@ -119,6 +125,17 @@ export default function App() {
     setSelectedPlanPropId(property.id);
     setActiveTab('floorplans');
   };
+
+  if (isAdmin) {
+    return (
+      <AdminUploadHub 
+        onBackToApp={() => {
+          window.history.pushState({}, '', '/');
+          setIsAdmin(false);
+        }} 
+      />
+    );
+  }
 
   return (
     <div className="app-container">
