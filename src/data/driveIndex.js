@@ -1,5 +1,5 @@
 // Índice Oficial de Arquivos Google Drive - Vetter Hub (Atualizado em Tempo Real)
-// 20 Arquivos Oficiais Mapeados (Tabelas de Setembro/2026 e Apresentações)
+// 21 Arquivos Oficiais Mapeados (Tabelas de Setembro/2026 e Apresentações)
 
 export const DRIVE_ROOT_URL = 'https://drive.google.com/drive/folders/1hL6hQs1pqr7-sp0bdkU14CXJWe8RBcht?usp=sharing';
 
@@ -7,18 +7,18 @@ export const INITIAL_DRIVE_INDEX = [
   {
     "id": "13x265bkWulRWJZOx5AMoNcVj74AgVdI5",
     "driveId": "13x265bkWulRWJZOx5AMoNcVj74AgVdI5",
-    "propertyName": "BAL HARBOUR   (1)",
-    "propertyId": "bal-harbour---(1)",
+    "propertyName": "Bal Harbour",
+    "propertyId": "bal-harbour",
     "folder": "Apresentação",
-    "name": "[BAL HARBOUR] ApresentaÃ§Ã£o Comercial  (1).pdf",
-    "title": "[BAL HARBOUR] ApresentaÃ§Ã£o Comercial  (1)",
+    "name": "[BAL HARBOUR] Apresentação Comercial  (1).pdf",
+    "title": "[BAL HARBOUR] Apresentação Comercial  (1)",
     "aliases": [
-      "bal harbour   (1)",
-      "book bal harbour   (1)",
-      "tabela do bal harbour   (1)",
-      "tabela bal harbour   (1)",
-      "apresentação bal harbour   (1)",
-      "apresentacao bal harbour   (1)"
+      "bal harbour",
+      "book bal harbour",
+      "tabela do bal harbour",
+      "tabela bal harbour",
+      "apresentação bal harbour",
+      "apresentacao bal harbour"
     ],
     "type": "pdf",
     "category": "book",
@@ -33,8 +33,8 @@ export const INITIAL_DRIVE_INDEX = [
     "propertyName": "Gold Coast",
     "propertyId": "gold-coast",
     "folder": "Apresentação",
-    "name": "[Gold Coast] ApresentaÃ§Ã£o Comercial.pdf",
-    "title": "[Gold Coast] ApresentaÃ§Ã£o Comercial",
+    "name": "[Gold Coast] Apresentação Comercial.pdf",
+    "title": "[Gold Coast] Apresentação Comercial",
     "aliases": [
       "gold coast",
       "book gold coast",
@@ -56,8 +56,8 @@ export const INITIAL_DRIVE_INDEX = [
     "propertyName": "Sunny Island",
     "propertyId": "sunny-island",
     "folder": "Apresentação",
-    "name": "[Sunny Island] CatÃ¡logo Digital WhatsApp.pdf",
-    "title": "[Sunny Island] CatÃ¡logo Digital WhatsApp",
+    "name": "[Sunny Island] Catálogo Digital WhatsApp.pdf",
+    "title": "[Sunny Island] Catálogo Digital WhatsApp",
     "aliases": [
       "sunny island",
       "book sunny island",
@@ -79,8 +79,8 @@ export const INITIAL_DRIVE_INDEX = [
     "propertyName": "The Wave",
     "propertyId": "the-wave",
     "folder": "Apresentação",
-    "name": "[The Wave] ApresentaÃ§Ã£o Comercial - Alta Qualidade.pdf",
-    "title": "[The Wave] ApresentaÃ§Ã£o Comercial - Alta Qualidade",
+    "name": "[The Wave] Apresentação Comercial - Alta Qualidade.pdf",
+    "title": "[The Wave] Apresentação Comercial - Alta Qualidade",
     "aliases": [
       "the wave",
       "book the wave",
@@ -102,8 +102,8 @@ export const INITIAL_DRIVE_INDEX = [
     "propertyName": "The Wave",
     "propertyId": "the-wave",
     "folder": "Apresentação",
-    "name": "[The Wave] ApresentaÃ§Ã£o Comercial - WhatsApp.pdf",
-    "title": "[The Wave] ApresentaÃ§Ã£o Comercial - WhatsApp",
+    "name": "[The Wave] Apresentação Comercial - WhatsApp.pdf",
+    "title": "[The Wave] Apresentação Comercial - WhatsApp",
     "aliases": [
       "the wave",
       "book the wave",
@@ -125,8 +125,8 @@ export const INITIAL_DRIVE_INDEX = [
     "propertyName": "Tropical Beach",
     "propertyId": "tropical-beach",
     "folder": "Apresentação",
-    "name": "[Tropical Beach] ApresentaÃ§Ã£o lanÃ§amento.pdf",
-    "title": "[Tropical Beach] ApresentaÃ§Ã£o lanÃ§amento",
+    "name": "[Tropical Beach] Apresentação lançamento.pdf",
+    "title": "[Tropical Beach] Apresentação lançamento",
     "aliases": [
       "tropical beach",
       "book tropical beach",
@@ -145,18 +145,18 @@ export const INITIAL_DRIVE_INDEX = [
   {
     "id": "1ySgIgql8ElLHJPaWNr6wta6dTV1OEHU7",
     "driveId": "1ySgIgql8ElLHJPaWNr6wta6dTV1OEHU7",
-    "propertyName": "WhatsApp Breeze",
-    "propertyId": "whatsapp-breeze",
+    "propertyName": "Breeze Tower",
+    "propertyId": "breeze-tower",
     "folder": "Apresentação",
-    "name": "[WhatsApp] ApresentaÃ§Ã£o Comercial_Breeze.pdf",
-    "title": "[WhatsApp] ApresentaÃ§Ã£o Comercial_Breeze",
+    "name": "[WhatsApp] Apresentação Comercial_Breeze.pdf",
+    "title": "[WhatsApp] Apresentação Comercial_Breeze",
     "aliases": [
-      "whatsapp breeze",
-      "book whatsapp breeze",
-      "tabela do whatsapp breeze",
-      "tabela whatsapp breeze",
-      "apresentação whatsapp breeze",
-      "apresentacao whatsapp breeze"
+      "breeze tower",
+      "book breeze tower",
+      "tabela do breeze tower",
+      "tabela breeze tower",
+      "apresentação breeze tower",
+      "apresentacao breeze tower"
     ],
     "type": "pdf",
     "category": "book",
@@ -171,8 +171,8 @@ export const INITIAL_DRIVE_INDEX = [
     "propertyName": "Coral Gables",
     "propertyId": "coral-gables",
     "folder": "Apresentação",
-    "name": "ApresentaÃ§Ã£o comercial Coral Gables.pdf",
-    "title": "ApresentaÃ§Ã£o comercial Coral Gables",
+    "name": "Apresentação comercial Coral Gables.pdf",
+    "title": "Apresentação comercial Coral Gables",
     "aliases": [
       "coral gables",
       "book coral gables",
@@ -191,18 +191,18 @@ export const INITIAL_DRIVE_INDEX = [
   {
     "id": "1MV2HDJ_hnT5WQznvLg45lVE5ePV0dvhq",
     "driveId": "1MV2HDJ_hnT5WQznvLg45lVE5ePV0dvhq",
-    "propertyName": "Dolphin Bay -",
-    "propertyId": "dolphin-bay--",
+    "propertyName": "Dolphin Bay",
+    "propertyId": "dolphin-bay",
     "folder": "Apresentação",
-    "name": "Dolphin Bay - ApresentaÃ§Ã£o lanÃ§amento.pdf",
-    "title": "Dolphin Bay - ApresentaÃ§Ã£o lanÃ§amento",
+    "name": "Dolphin Bay - Apresentação lançamento.pdf",
+    "title": "Dolphin Bay - Apresentação lançamento",
     "aliases": [
-      "dolphin bay -",
-      "book dolphin bay -",
-      "tabela do dolphin bay -",
-      "tabela dolphin bay -",
-      "apresentação dolphin bay -",
-      "apresentacao dolphin bay -"
+      "dolphin bay",
+      "book dolphin bay",
+      "tabela do dolphin bay",
+      "tabela dolphin bay",
+      "apresentação dolphin bay",
+      "apresentacao dolphin bay"
     ],
     "type": "pdf",
     "category": "book",
@@ -240,8 +240,8 @@ export const INITIAL_DRIVE_INDEX = [
     "propertyName": "Fort Myers",
     "propertyId": "fort-myers",
     "folder": "Apresentação",
-    "name": "Fort Myers_ApresentaÃ§Ã£o LanÃ§amento (2).pdf",
-    "title": "Fort Myers_ApresentaÃ§Ã£o LanÃ§amento (2)",
+    "name": "Fort Myers_Apresentação Lançamento (2).pdf",
+    "title": "Fort Myers_Apresentação Lançamento (2)",
     "aliases": [
       "fort myers",
       "book fort myers",
@@ -260,18 +260,18 @@ export const INITIAL_DRIVE_INDEX = [
   {
     "id": "1QmYO8IEL6Jh3jhZCjslQZw_Ct4bbvVsC",
     "driveId": "1QmYO8IEL6Jh3jhZCjslQZw_Ct4bbvVsC",
-    "propertyName": "Royal Bay -",
-    "propertyId": "royal-bay--",
+    "propertyName": "Royal Bay",
+    "propertyId": "royal-bay",
     "folder": "Apresentação",
-    "name": "Royal Bay - ApresentaÃ§Ã£o lanÃ§amento.pdf",
-    "title": "Royal Bay - ApresentaÃ§Ã£o lanÃ§amento",
+    "name": "Royal Bay - Apresentação lançamento.pdf",
+    "title": "Royal Bay - Apresentação lançamento",
     "aliases": [
-      "royal bay -",
-      "book royal bay -",
-      "tabela do royal bay -",
-      "tabela royal bay -",
-      "apresentação royal bay -",
-      "apresentacao royal bay -"
+      "royal bay",
+      "book royal bay",
+      "tabela do royal bay",
+      "tabela royal bay",
+      "apresentação royal bay",
+      "apresentacao royal bay"
     ],
     "type": "pdf",
     "category": "book",
@@ -283,18 +283,18 @@ export const INITIAL_DRIVE_INDEX = [
   {
     "id": "12cwcp-NpJHmJKZKtQsn08esH069rmvAQ",
     "driveId": "12cwcp-NpJHmJKZKtQsn08esH069rmvAQ",
-    "propertyName": "Ocean Park  05.09",
-    "propertyId": "ocean-park--05.09",
+    "propertyName": "Ocean Park",
+    "propertyId": "ocean-park",
     "folder": "Apresentação",
-    "name": "V2 [Ocean Park] ApresentaÃ§Ã£o Comercial 05.09.pdf",
-    "title": "V2 [Ocean Park] ApresentaÃ§Ã£o Comercial 05.09",
+    "name": "V2 [Ocean Park] Apresentação Comercial 05.09.pdf",
+    "title": "V2 [Ocean Park] Apresentação Comercial 05.09",
     "aliases": [
-      "ocean park  05.09",
-      "book ocean park  05.09",
-      "tabela do ocean park  05.09",
-      "tabela ocean park  05.09",
-      "apresentação ocean park  05.09",
-      "apresentacao ocean park  05.09"
+      "ocean park",
+      "book ocean park",
+      "tabela do ocean park",
+      "tabela ocean park",
+      "apresentação ocean park",
+      "apresentacao ocean park"
     ],
     "type": "pdf",
     "category": "book",
@@ -309,15 +309,16 @@ export const INITIAL_DRIVE_INDEX = [
     "propertyName": "Emerald Coast",
     "propertyId": "emerald-coast",
     "folder": "Apresentação",
-    "name": "Vetter_Emerald Coast_lanÃ§amento.pdf",
-    "title": "Vetter_Emerald Coast_lanÃ§amento",
+    "name": "Vetter_Emerald Coast_lançamento.pdf",
+    "title": "Vetter_Emerald Coast_lançamento",
     "aliases": [
       "emerald coast",
+      "emerald",
       "book emerald coast",
       "tabela do emerald coast",
-      "tabela emerald coast",
-      "apresentação emerald coast",
-      "apresentacao emerald coast"
+      "tabela emerald",
+      "apresentação emerald",
+      "apresentacao emerald"
     ],
     "type": "pdf",
     "category": "book",
@@ -329,18 +330,19 @@ export const INITIAL_DRIVE_INDEX = [
   {
     "id": "1lQnc-fAM_4InMsuiOlxyPzsWd-TVCkmR",
     "driveId": "1lQnc-fAM_4InMsuiOlxyPzsWd-TVCkmR",
-    "propertyName": "WhatsApp â Palm Springs Tower",
-    "propertyId": "whatsapp-â-palm-springs-tower",
+    "propertyName": "Palm Springs",
+    "propertyId": "palm-springs",
     "folder": "Apresentação",
-    "name": "WhatsApp â Palm Springs Tower.pdf",
-    "title": "WhatsApp â Palm Springs Tower",
+    "name": "WhatsApp — Palm Springs Tower.pdf",
+    "title": "WhatsApp — Palm Springs Tower",
     "aliases": [
-      "whatsapp â palm springs tower",
-      "book whatsapp â palm springs tower",
-      "tabela do whatsapp â palm springs tower",
-      "tabela whatsapp â palm springs tower",
-      "apresentação whatsapp â palm springs tower",
-      "apresentacao whatsapp â palm springs tower"
+      "palm springs",
+      "palm springs tower",
+      "book palm springs",
+      "tabela do palm springs",
+      "tabela palm springs",
+      "apresentação palm springs",
+      "apresentacao palm springs"
     ],
     "type": "pdf",
     "category": "book",
@@ -352,7 +354,7 @@ export const INITIAL_DRIVE_INDEX = [
   {
     "id": "13Bxapfll-TQn8h1EA31CFreIFMq4VR-b",
     "driveId": "13Bxapfll-TQn8h1EA31CFreIFMq4VR-b",
-    "propertyName": "BAL HARBOUR",
+    "propertyName": "Bal Harbour",
     "propertyId": "bal-harbour",
     "folder": "Tabela",
     "name": "Tabela BAL HARBOUR - Setembro 266.pdf",
@@ -361,9 +363,8 @@ export const INITIAL_DRIVE_INDEX = [
       "bal harbour",
       "tabela bal harbour",
       "tabela do bal harbour",
-      "tabela bal harbour",
-      "apresentação bal harbour",
-      "apresentacao bal harbour"
+      "tabela de vendas bal harbour",
+      "preço bal harbour"
     ],
     "type": "pdf",
     "category": "tabela",
@@ -371,6 +372,31 @@ export const INITIAL_DRIVE_INDEX = [
     "updatedAt": "Setembro/2026 (Atualizado)",
     "url": "https://drive.google.com/uc?export=download&id=13Bxapfll-TQn8h1EA31CFreIFMq4VR-b",
     "viewUrl": "https://drive.google.com/file/d/13Bxapfll-TQn8h1EA31CFreIFMq4VR-b/view?usp=sharing"
+  },
+  {
+    "id": "1HzJiyZwJ1kOqdJ9J7ozZKMeCNOgB9isd",
+    "driveId": "1HzJiyZwJ1kOqdJ9J7ozZKMeCNOgB9isd",
+    "propertyName": "Emerald Coast",
+    "propertyId": "emerald-coast",
+    "folder": "Tabela",
+    "name": "Tabela de preços Emerald - Setembro 20266.pdf",
+    "title": "Tabela de preços Emerald - Setembro 20266",
+    "aliases": [
+      "emerald coast",
+      "emerald",
+      "tabela emerald",
+      "tabela do emerald",
+      "tabela de preços emerald",
+      "tabela de precos emerald",
+      "tabela emerald coast",
+      "tabela de vendas emerald"
+    ],
+    "type": "pdf",
+    "category": "tabela",
+    "size": "2.8 MB",
+    "updatedAt": "Setembro/2026 (Atualizado)",
+    "url": "https://drive.google.com/uc?export=download&id=1HzJiyZwJ1kOqdJ9J7ozZKMeCNOgB9isd",
+    "viewUrl": "https://drive.google.com/file/d/1HzJiyZwJ1kOqdJ9J7ozZKMeCNOgB9isd/view?usp=sharing"
   },
   {
     "id": "1oYmK6mibBCuTgK_FPyMzxSHfmLTO1Gg_",
@@ -384,9 +410,8 @@ export const INITIAL_DRIVE_INDEX = [
       "dolphin bay",
       "tabela dolphin bay",
       "tabela do dolphin bay",
-      "tabela dolphin bay",
-      "apresentação dolphin bay",
-      "apresentacao dolphin bay"
+      "tabela de vendas dolphin bay",
+      "preço dolphin bay"
     ],
     "type": "pdf",
     "category": "tabela",
@@ -407,9 +432,8 @@ export const INITIAL_DRIVE_INDEX = [
       "fort myers",
       "tabela fort myers",
       "tabela do fort myers",
-      "tabela fort myers",
-      "apresentação fort myers",
-      "apresentacao fort myers"
+      "tabela de vendas fort myers",
+      "preço fort myers"
     ],
     "type": "pdf",
     "category": "tabela",
@@ -430,9 +454,8 @@ export const INITIAL_DRIVE_INDEX = [
       "royal bay",
       "tabela royal bay",
       "tabela do royal bay",
-      "tabela royal bay",
-      "apresentação royal bay",
-      "apresentacao royal bay"
+      "tabela de vendas royal bay",
+      "preço royal bay"
     ],
     "type": "pdf",
     "category": "tabela",
@@ -453,9 +476,8 @@ export const INITIAL_DRIVE_INDEX = [
       "tropical beach",
       "tabela tropical beach",
       "tabela do tropical beach",
-      "tabela tropical beach",
-      "apresentação tropical beach",
-      "apresentacao tropical beach"
+      "tabela de vendas tropical beach",
+      "preço tropical beach"
     ],
     "type": "pdf",
     "category": "tabela",
@@ -466,14 +488,14 @@ export const INITIAL_DRIVE_INDEX = [
   }
 ];
 
-const STORAGE_KEY = 'vetter_drive_index_v3_set26';
+const STORAGE_KEY = 'vetter_drive_index_v4_set26_21files';
 
 export function getStoredDriveIndex() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed) && parsed.length >= 21) {
         return parsed;
       }
     }
