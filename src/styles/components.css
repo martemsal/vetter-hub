@@ -1072,4 +1072,98 @@
   text-align: center;
 }
 
+/* Chat Pipeline Unit Cards */
+.chat-unit-card {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(212, 160, 23, 0.35);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.chat-unit-card:hover {
+  border-color: var(--gold-primary);
+  transform: translateY(-1px);
+}
+
+.chat-unit-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 6px;
+}
+
+.chat-unit-prop-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.chat-unit-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-unit-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.chat-unit-area {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.chat-unit-price-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.chat-unit-price-val {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--gold-primary);
+  letter-spacing: -0.01em;
+}
+
+.chat-unit-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 6px;
+}
+
+.chat-unit-share-btn {
+  background: rgba(37, 211, 102, 0.12);
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  color: #25D366;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chat-unit-share-btn:active {
+  transform: scale(0.96);
+  background: rgba(37, 211, 102, 0.25);
+}
+
+
 

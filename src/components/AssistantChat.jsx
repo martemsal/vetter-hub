@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Send, Sparkles, Bot, 
   Mic, MicOff, Volume2, VolumeX, Download, Eye, 
-  Share2, FileSpreadsheet, FileText, CheckCircle, Search, ExternalLink 
+  Share2, FileSpreadsheet, FileText, CheckCircle, Search, ExternalLink, Building 
 } from 'lucide-react';
 import { getStoredDriveIndex } from '../data/driveIndex';
 import { searchDriveWithGeminiIntelligence } from '../utils/geminiDriveEngine';
@@ -139,6 +139,36 @@ export default function AssistantChat({ driveFiles }) {
     window.open(whatsappUrl, '_blank');
   };
 
+  const handleShareUnit = (unit) => {
+    const text = `*Vetter Empreendimentos*\n🏢 *${unit.property}* — ${unit.unit}\n📐 Área: ${unit.areaPrivativa || 'Consulte'}\n✨ Tipologia: ${unit.tipo}\n💰 *Valor VGV: ${unit.valorVGV}*\n\n_Consulte mais detalhes no Vetter Hub._`;
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const getUnitTypeBadge = (tipo) => {
+    let color = '#94a3b8';
+    let bg = 'rgba(255, 255, 255, 0.05)';
+    if (tipo.includes('2S')) {
+      color = '#38bdf8';
+      bg = 'rgba(56, 189, 248, 0.12)';
+    } else if (tipo.includes('3S')) {
+      color = 'var(--gold-primary)';
+      bg = 'rgba(212, 160, 23, 0.12)';
+    } else if (tipo.includes('4S')) {
+      color = '#a855f7';
+      bg = 'rgba(168, 85, 247, 0.12)';
+    } else if (tipo.includes('5S')) {
+      color = '#ec4899';
+      bg = 'rgba(236, 72, 153, 0.12)';
+    }
+
+    return (
+      <span style={{ fontSize: 10, fontWeight: 700, color, background: bg, padding: '2px 7px', borderRadius: 6, border: `1px solid ${color}44` }}>
+        {tipo}
+      </span>
+    );
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -177,11 +207,12 @@ export default function AssistantChat({ driveFiles }) {
             id: newMsgId,
             sender: 'assistant',
             text: availResult.text,
-            files: []
+            files: [],
+            units: availResult.units || []
           };
           setMessages((prev) => [...prev, assistantMsg]);
           if (wasVoice) {
-            speakText("Aqui estão as informações de disponibilidade do empreendimento.", newMsgId);
+            speakText("Aqui estão as opções de unidades disponíveis no Pipeline.", newMsgId);
           }
           return;
         }
@@ -361,6 +392,51 @@ export default function AssistantChat({ driveFiles }) {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Renderiza CARDS VISUAIS DE UNIDADES DO PIPELINE */}
+            {msg.units && msg.units.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: '420px', overflowY: 'auto', paddingRight: 4 }}>
+                  {msg.units.map((unit, idx) => (
+                    <div key={`${unit.property}-${unit.unit}-${idx}`} className="chat-unit-card">
+                      <div className="chat-unit-card-header">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <Building size={14} color="var(--gold-primary)" />
+                          <span className="chat-unit-prop-name">{unit.property}</span>
+                        </div>
+                        {getUnitTypeBadge(unit.tipo)}
+                      </div>
+
+                      <div className="chat-unit-card-body">
+                        <div>
+                          <div className="chat-unit-name">{unit.unit}</div>
+                          <div className="chat-unit-area">
+                            📐 {unit.areaPrivativa || 'Sob consulta'}
+                            {unit.valorM2 && <span> • {unit.valorM2}</span>}
+                          </div>
+                        </div>
+                        
+                        <div style={{ textAlign: 'right' }}>
+                          <div className="chat-unit-price-label">Valor VGV</div>
+                          <div className="chat-unit-price-val">{unit.valorVGV}</div>
+                        </div>
+                      </div>
+
+                      <div className="chat-unit-card-footer">
+                        <button 
+                          className="chat-unit-share-btn"
+                          onClick={() => handleShareUnit(unit)}
+                          title="Enviar dados da unidade via WhatsApp"
+                        >
+                          <Share2 size={13} />
+                          <span>Compartilhar Unidade</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

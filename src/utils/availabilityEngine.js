@@ -138,8 +138,9 @@ export async function queryAvailabilityWithContext(query, lastPropertyContextId 
 
       return {
         matched: true,
-        text: `🏢 **Temos ${typeLabel}${priceLabel}${scopeLabel}**\n\n${resultsList}${extraCount}\n\n` +
-              `🔍 *Dados extraídos em tempo real do Pipeline oficial de vendas Vetter.*`,
+        text: `🏢 **Temos ${typeLabel}${priceLabel}${scopeLabel}**\nEncontramos **${pool.length} opções disponíveis** no Pipeline de Vendas:`,
+        units: pool.slice(0, 15),
+        totalCount: pool.length,
         propertyId: property ? property.id : null
       };
     } else {
@@ -150,6 +151,7 @@ export async function queryAvailabilityWithContext(query, lastPropertyContextId 
       return {
         matched: true,
         text: `🔴 Não localizamos nenhuma unidade **${typeLabel}** disponível${priceLabel}${scopeLabel} no momento no Pipeline.`,
+        units: [],
         propertyId: property ? property.id : null
       };
     }
@@ -165,13 +167,8 @@ export async function queryAvailabilityWithContext(query, lastPropertyContextId 
     if (unitData) {
       return {
         matched: true,
-        text: `🏢 **${property.name} — ${unitData.unit}**\n\n` +
-              `• **Situação:** ${unitData.situacao === 'Disponível' ? '🟢 Disponível' : '🔴 ' + unitData.situacao}\n` +
-              `• **Tipologia:** ${unitData.tipo} (${unitData.tipo.includes('S') ? unitData.tipo.replace('S', '') + ' Suítes' : unitData.tipo})\n` +
-              `• **Área Privativa:** ${unitData.areaPrivativa || 'Sob consulta'}\n` +
-              `• **Valor VGV:** **${unitData.valorVGV}**\n` +
-              (unitData.valorM2 ? `• **Valor m²:** ${unitData.valorM2}\n\n` : '\n') +
-              `*Informação oficial da planilha Pipeline Vetter.*`,
+        text: `🏢 **${property.name} — ${unitData.unit}**\nInformações da unidade no Pipeline:`,
+        units: [unitData],
         propertyId: property.id
       };
     }
@@ -185,17 +182,17 @@ export async function queryAvailabilityWithContext(query, lastPropertyContextId 
     const matchingUnits = propertyUnits.filter(u => u.final === finalNum && u.situacao === 'Disponível');
 
     if (matchingUnits.length > 0) {
-      const listStr = matchingUnits.map(u => `• **${u.unit}** (Tipo: ${u.tipo} | Área: ${u.areaPrivativa}) ➔ **${u.valorVGV}**`).join('\n');
       return {
         matched: true,
-        text: `🟢 **Unidades Disponíveis — ${property.name} (Final ${finalNum})**\n\n${listStr}\n\n` +
-              `*Dados oficiais do Pipeline de Vendas.*`,
+        text: `🟢 **Unidades Disponíveis — ${property.name} (Final ${finalNum})**\nEncontramos **${matchingUnits.length} opções**:`,
+        units: matchingUnits,
         propertyId: property.id
       };
     } else {
       return {
         matched: true,
         text: `🔴 Não encontramos unidades com **final ${finalNum}** disponíveis no **${property.name}**.`,
+        units: [],
         propertyId: property.id
       };
     }
@@ -207,14 +204,11 @@ export async function queryAvailabilityWithContext(query, lastPropertyContextId 
     const availableUnits = propertyUnits.filter(u => u.situacao === 'Disponível');
 
     if (availableUnits.length > 0) {
-      const listStr = availableUnits.slice(0, 8).map(u => `• **${u.unit}** (Tipo: ${u.tipo}) ➔ **${u.valorVGV}**`).join('\n');
-      const extraCount = availableUnits.length > 8 ? `\n...e mais ${availableUnits.length - 8} unidades disponíveis.` : '';
-
       return {
         matched: true,
-        text: `🏢 **Unidades Disponíveis no ${property.name} (${availableUnits.length} no total)**\n\n` +
-              `${listStr}${extraCount}\n\n` +
-              `🔍 *Você pode filtrar por suítes ou valor (ex: "3 suítes até 3 milhões no ${property.name}").*`,
+        text: `🏢 **Unidades Disponíveis no ${property.name}**\nEncontramos **${availableUnits.length} unidades disponíveis**:`,
+        units: availableUnits.slice(0, 15),
+        totalCount: availableUnits.length,
         propertyId: property.id
       };
     }
