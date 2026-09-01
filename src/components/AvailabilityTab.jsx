@@ -1,35 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Building2, Search, CheckCircle2, XCircle, AlertCircle, 
-  DollarSign, ArrowUpRight, Scale, ChevronDown, ChevronUp, FileSpreadsheet, RefreshCw 
+  DollarSign, ArrowUpRight, Scale, ChevronDown, ChevronUp, FileSpreadsheet, RefreshCw, Layers 
 } from 'lucide-react';
-import { getAvailabilityFiles } from '../data/availabilityIndex';
-import { getPropertyAvailability } from '../utils/availabilityEngine';
+import { getPropertyAvailability, getAvailablePipelineProperties } from '../utils/availabilityEngine';
 
 export default function AvailabilityTab() {
-  const [properties] = useState(() => getAvailabilityFiles());
-  const [selectedPropertyId, setSelectedPropertyId] = useState('bal-harbour');
+  const [properties] = useState(() => getAvailablePipelineProperties());
+  const [selectedPropertyId, setSelectedPropertyId] = useState(() => {
+    const list = getAvailablePipelineProperties();
+    return list.length > 0 ? list[0].id : 'bal-harbour';
+  });
+  
   const [rawUnits, setRawUnits] = useState([]);
   const [displayUnits, setDisplayUnits] = useState([]);
   
-  // Filtros locais (atualizados pelos controles)
+  // Filtros locais (Finais, Tipos e Status)
   const [filterFinal, setFilterFinal] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterType, setFilterType] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('Disponível');
   
   const [loading, setLoading] = useState(false);
-  const [expandedUnit, setExpandedUnit] = useState(null);
 
-  // Carrega os dados de unidades do cache/Drive ao mudar o empreendimento
+  // Carrega os dados de unidades do Pipeline ao mudar o empreendimento
   useEffect(() => {
     async function loadData() {
-      const data = await getPropertyAvailability(selectedPropertyId);
+      const data = getPropertyAvailability(selectedPropertyId);
       setRawUnits(data);
-      // Carrega inicialmente mostrando todos os disponíveis
+      
+      // Carrega inicialmente mostrando as unidades disponíveis
       const initialDisplay = data.filter(u => u.situacao === 'Disponível');
       setDisplayUnits(initialDisplay);
       setFilterFinal('all');
-      setFilterStatus('Disponível'); // Mostra os disponíveis de início
-      setExpandedUnit(null);
+      setFilterType('all');
+      setFilterStatus('Disponível');
     }
     loadData();
   }, [selectedPropertyId]);
@@ -37,22 +41,24 @@ export default function AvailabilityTab() {
   // Função disparada ao clicar no botão "Buscar"
   const handleSearch = () => {
     setLoading(true);
-    setExpandedUnit(null);
     
     setTimeout(() => {
       const results = rawUnits.filter(u => {
         // Filtro por Final
         const matchesFinal = filterFinal === 'all' || u.final === filterFinal;
         
+        // Filtro por Tipo (2S, 3S, 4S...)
+        const matchesType = filterType === 'all' || u.tipo.toUpperCase().includes(filterType.toUpperCase());
+        
         // Filtro por Status
         const matchesStatus = filterStatus === 'all' || u.situacao === filterStatus;
         
-        return matchesFinal && matchesStatus;
+        return matchesFinal && matchesType && matchesStatus;
       });
       
       setDisplayUnits(results);
       setLoading(false);
-    }, 150);
+    }, 100);
   };
 
   const getStatusBadge = (status) => {
@@ -84,60 +90,130 @@ export default function AvailabilityTab() {
     }
   };
 
+  const getTypeBadge = (tipo) => {
+    let color = '#94a3b8';
+    let bg = 'rgba(255, 255, 255, 0.05)';
+    
+    if (tipo.includes('2S')) {
+      color = '#38bdf8';
+      bg = 'rgba(56, 189, 248, 0.12)';
+    } else if (tipo.includes('3S')) {
+      color = 'var(--gold-primary)';
+      bg = 'rgba(212, 160, 23, 0.12)';
+    } else if (tipo.includes('4S')) {
+      color = '#a855f7';
+      bg = 'rgba(168, 85, 247, 0.12)';
+    } else if (tipo.includes('5S')) {
+      color = '#ec4899';
+      bg = 'rgba(236, 72, 153, 0.12)';
+    }
+
+    return (
+      <span 
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          color,
+          background: bg,
+          padding: '2px 8px',
+          borderRadius: 6,
+          border: `1px solid ${color}44`
+        }}
+      >
+        {tipo}
+      </span>
+    );
+  };
+
+  const currentPropertyObj = properties.find(p => p.id === selectedPropertyId);
+
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 18, paddingBottom: 40 }}>
       <div>
-        <span className="gold-badge">Tabela de Vendas Integrada</span>
-        <h2 style={{ fontSize: 22, marginTop: 4 }}>Disponibilidade & Fluxo</h2>
+        <span className="gold-badge">Pipeline de Vendas Oficial</span>
+        <h2 style={{ fontSize: 22, marginTop: 4 }}>Disponibilidade & VGV</h2>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-          Selecione os parâmetros e clique em **Buscar** para carregar as unidades oficiais.
+          Consulte unidades, tipologias e valores VGV de todos os 22 empreendimentos Vetter.
         </p>
       </div>
 
       {/* Seleção do Empreendimento */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-          Selecione o Empreendimento
-        </h4>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+            Empreendimento ({properties.length} disponíveis)
+          </h4>
+          {currentPropertyObj && (
+            <span style={{ fontSize: 11, color: 'var(--accent-emerald)', fontWeight: 600 }}>
+              {currentPropertyObj.availableCount} disponíveis de {currentPropertyObj.totalUnits}
+            </span>
+          )}
+        </div>
+
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
           {properties.map((p) => {
-            const isSelected = selectedPropertyId === p.propertyId;
+            const isSelected = selectedPropertyId === p.id;
             return (
               <button
-                key={p.propertyId}
-                onClick={() => setSelectedPropertyId(p.propertyId)}
+                key={p.id}
+                onClick={() => setSelectedPropertyId(p.id)}
                 className={`filter-chip ${isSelected ? 'active' : ''}`}
                 style={{ flexShrink: 0 }}
               >
-                {p.propertyName}
+                {p.name}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Layout de Filtros: Finais à Esquerda, Status ao lado, Botão Buscar à Direita */}
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      {/* Layout de Filtros: Finais, Tipo, Status e Botão Buscar */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr auto', gap: 6, alignItems: 'center' }}>
         {/* Seletor de Finais */}
         <select
           value={filterFinal}
           onChange={(e) => setFilterFinal(e.target.value)}
           style={{
-            flex: 1,
             background: 'var(--bg-card)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',
-            padding: '10px 12px',
+            padding: '10px 8px',
             color: 'var(--text-primary)',
-            fontSize: 13,
+            fontSize: 12,
             outline: 'none'
           }}
         >
-          <option value="all">Todos Finais</option>
+          <option value="all">Finais</option>
           <option value="01">Final 01</option>
           <option value="02">Final 02</option>
           <option value="03">Final 03</option>
           <option value="04">Final 04</option>
+          <option value="05">Final 05</option>
+          <option value="06">Final 06</option>
+          <option value="07">Final 07</option>
+        </select>
+
+        {/* Seletor de Tipo */}
+        <select
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            padding: '10px 8px',
+            color: 'var(--text-primary)',
+            fontSize: 12,
+            outline: 'none'
+          }}
+        >
+          <option value="all">Tipos</option>
+          <option value="2S">2 Suítes</option>
+          <option value="3S">3 Suítes</option>
+          <option value="4S">4 Suítes</option>
+          <option value="5S">5 Suítes</option>
+          <option value="Garden">Garden</option>
+          <option value="Sala">Sala</option>
         </select>
 
         {/* Seletor de Status */}
@@ -145,13 +221,12 @@ export default function AvailabilityTab() {
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
           style={{
-            flex: 1,
             background: 'var(--bg-card)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',
-            padding: '10px 12px',
+            padding: '10px 8px',
             color: 'var(--text-primary)',
-            fontSize: 13,
+            fontSize: 12,
             outline: 'none'
           }}
         >
@@ -166,14 +241,14 @@ export default function AvailabilityTab() {
           className="btn-primary"
           onClick={handleSearch}
           style={{
-            padding: '10px 16px',
+            padding: '10px 14px',
             whiteSpace: 'nowrap',
             display: 'flex',
             alignItems: 'center',
-            gap: 6
+            gap: 4
           }}
         >
-          <Search size={15} />
+          <Search size={14} />
           <span>Buscar</span>
         </button>
       </div>
@@ -182,96 +257,43 @@ export default function AvailabilityTab() {
       {loading ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-secondary)' }}>
           <RefreshCw size={32} className="recording" style={{ margin: '0 auto 12px' }} />
-          <p>Carregando unidades da planilha...</p>
+          <p>Filtrando unidades...</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {displayUnits.length > 0 ? (
-            displayUnits.map((u) => {
-              const isExpanded = expandedUnit === u.unit;
+            displayUnits.map((u, idx) => {
               return (
                 <div 
-                  key={u.unit}
+                  key={`${u.propertyId}-${u.unit}-${idx}`}
                   style={{
                     background: 'var(--bg-card)',
-                    border: isExpanded ? '1px solid var(--border-gold)' : '1px solid var(--border-subtle)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: 'var(--radius-md)',
-                    overflow: 'hidden',
+                    padding: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                     transition: 'all 0.2s'
                   }}
                 >
-                  <div 
-                    onClick={() => setExpandedUnit(isExpanded ? null : u.unit)}
-                    style={{
-                      padding: '14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: 15, fontWeight: 800 }}>{u.unit}</div>
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                        Área Privativa: {u.areaPrivativa}
-                      </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 16, fontWeight: 800 }}>{u.unit}</span>
+                      {getTypeBadge(u.tipo)}
                     </div>
-                    
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--gold-primary)' }}>{u.valorTotal}</div>
-                        <div style={{ marginTop: 2 }}>{getStatusBadge(u.situacao)}</div>
-                      </div>
-                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+                      Área Privativa: {u.areaPrivativa || 'Sob consulta'}
+                      {u.valorM2 && <span style={{ marginLeft: 6 }}>• m²: {u.valorM2}</span>}
                     </div>
                   </div>
-
-                  {/* Fluxo de Pagamento Expandido */}
-                  {isExpanded && (
-                    <div 
-                      style={{
-                        padding: '14px',
-                        background: 'rgba(230, 195, 92, 0.03)',
-                        borderTop: '1px solid var(--border-subtle)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 12
-                      }}
-                    >
-                      <h4 style={{ fontSize: 12, textTransform: 'uppercase', color: 'var(--gold-primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <DollarSign size={14} />
-                        <span>Fluxo de Pagamento Sugerido</span>
-                      </h4>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                        <div style={{ background: '#020617', padding: 8, borderRadius: 6, border: '1px solid var(--border-subtle)' }}>
-                          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Entrada (1x)</span>
-                          <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{u.fluxo.entrada || 'Consulte'}</div>
-                        </div>
-
-                        <div style={{ background: '#020617', padding: 8, borderRadius: 6, border: '1px solid var(--border-subtle)' }}>
-                          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Parcelas Mensais</span>
-                          <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{u.fluxo.mensais || 'Consulte'}</div>
-                        </div>
-
-                        <div style={{ background: '#020617', padding: 8, borderRadius: 6, border: '1px solid var(--border-subtle)' }}>
-                          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Reforços Anuais</span>
-                          <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{u.fluxo.anuais || 'Consulte'}</div>
-                        </div>
-
-                        <div style={{ background: '#020617', padding: 8, borderRadius: 6, border: '1px solid var(--border-subtle)' }}>
-                          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Parcela Final</span>
-                          <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{u.fluxo.final || 'Consulte'}</div>
-                        </div>
-                      </div>
-
-                      {u.espacoComplementar && (
-                        <div style={{ fontSize: 11, color: 'var(--text-secondary)', background: 'rgba(255, 255, 255, 0.02)', padding: '6px 10px', borderRadius: 4 }}>
-                          📦 **Complementos:** {u.espacoComplementar}
-                        </div>
-                      )}
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--gold-primary)' }}>
+                      {u.valorVGV}
                     </div>
-                  )}
+                    <div>{getStatusBadge(u.situacao)}</div>
+                  </div>
                 </div>
               );
             })
@@ -283,6 +305,7 @@ export default function AvailabilityTab() {
                 className="btn-secondary" 
                 onClick={() => {
                   setFilterFinal('all');
+                  setFilterType('all');
                   setFilterStatus('all');
                   setDisplayUnits(rawUnits);
                 }}

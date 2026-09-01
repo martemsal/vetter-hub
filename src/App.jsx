@@ -13,8 +13,6 @@ import { getStoredDriveIndex } from './data/driveIndex';
 import DutyTab from './components/DutyTab';
 import AvailabilityTab from './components/AvailabilityTab';
 import StaffScheduleTab from './components/StaffScheduleTab';
-import { getAvailabilityFiles } from './data/availabilityIndex';
-import { getPropertyAvailability } from './utils/availabilityEngine';
 
 
 export default function App() {
@@ -28,7 +26,7 @@ export default function App() {
   const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced' | 'error'
   const searchRecognitionRef = useRef(null);
 
-  // Gatilho de Sincronização em Tempo Real na Inicialização (Drive Scanner + Prefetch Disponibilidade)
+  // Gatilho de Sincronização em Tempo Real na Inicialização (Drive Scanner)
   useEffect(() => {
     async function initDriveSync() {
       setSyncStatus('syncing');
@@ -43,16 +41,6 @@ export default function App() {
       } catch (err) {
         console.error(err);
         setSyncStatus('error');
-      }
-
-      // Prefetch silencioso de todas as disponibilidades em background
-      try {
-        const availList = getAvailabilityFiles();
-        for (const p of availList) {
-          getPropertyAvailability(p.propertyId);
-        }
-      } catch (e) {
-        console.warn('Erro no prefetch:', e);
       }
     }
     initDriveSync();
