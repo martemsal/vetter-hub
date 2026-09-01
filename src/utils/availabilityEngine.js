@@ -272,19 +272,31 @@ export async function queryAvailabilityWithContext(query, lastPropertyContextId 
     }
   }
 
-  // Caso C: Busca geral de disponibilidade do empreendimento
-  const availableUnits = units.filter(u => u.situacao === 'Disponível');
-  if (availableUnits.length > 0) {
-    const listStr = availableUnits.slice(0, 5).map(u => `• **${u.unit}** (Final ${u.final}) — ${u.valorTotal}`).join('\n');
-    const extraCount = availableUnits.length > 5 ? `\n...e mais ${availableUnits.length - 5} unidades disponíveis.` : '';
-    
-    return {
-      matched: true,
-      text: `🏢 **Unidades Disponíveis no ${property.propertyName} (${availableUnits.length} no total)**\n\n` +
-            `${listStr}${extraCount}\n\n` +
-            `🔍 *Dica: Solicite o final desejado ou o fluxo de pagamento (ex: "Quais unidades final 01 do Bal Harbour" ou "Fluxo da unidade 601").*`,
-      propertyId: property.propertyId
-    };
+  // Caso C: Busca geral de disponibilidade do empreendimento (apenas quando expressamente solicitado)
+  const isExplicitAvailabilityQuery = 
+    norm.includes('disponib') || 
+    norm.includes('estoque') || 
+    norm.includes('quais unidades') || 
+    norm.includes('quantas unidades') || 
+    norm.includes('tem unidade') || 
+    norm.includes('tem apto') || 
+    norm.includes('tem apartamento') || 
+    norm.includes('unidades dispon');
+
+  if (isExplicitAvailabilityQuery) {
+    const availableUnits = units.filter(u => u.situacao === 'Disponível');
+    if (availableUnits.length > 0) {
+      const listStr = availableUnits.slice(0, 5).map(u => `• **${u.unit}** (Final ${u.final}) — ${u.valorTotal}`).join('\n');
+      const extraCount = availableUnits.length > 5 ? `\n...e mais ${availableUnits.length - 5} unidades disponíveis.` : '';
+      
+      return {
+        matched: true,
+        text: `🏢 **Unidades Disponíveis no ${property.propertyName} (${availableUnits.length} no total)**\n\n` +
+              `${listStr}${extraCount}\n\n` +
+              `🔍 *Dica: Solicite o final desejado ou o fluxo de pagamento (ex: "Quais unidades final 01 do Bal Harbour" ou "Fluxo da unidade 601").*`,
+        propertyId: property.propertyId
+      };
+    }
   }
 
   return { matched: false, text: "", propertyId: null };
