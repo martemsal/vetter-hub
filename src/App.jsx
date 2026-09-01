@@ -12,6 +12,7 @@ import { runRealtimeDriveScanner } from './utils/driveScanner';
 import { getStoredDriveIndex } from './data/driveIndex';
 import DutyTab from './components/DutyTab';
 import AvailabilityTab from './components/AvailabilityTab';
+import StaffScheduleTab from './components/StaffScheduleTab';
 import { getAvailabilityFiles } from './data/availabilityIndex';
 import { getPropertyAvailability } from './utils/availabilityEngine';
 
@@ -259,6 +260,10 @@ export default function App() {
 
         {activeTab === 'availability' && (
           <AvailabilityTab />
+        )}
+
+        {activeTab === 'schedule' && (
+          <StaffScheduleTab />
         )}
       </main>
 
