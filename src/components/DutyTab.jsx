@@ -5,10 +5,10 @@ import { getStoredDutyScale, saveStoredDutyScale } from '../data/dutyScale';
 export default function DutyTab() {
   const [scaleData, setScaleData] = useState(() => getStoredDutyScale());
   const [selectedDay, setSelectedDay] = useState(() => {
-    // Tenta pegar o dia atual se for agosto de 2026, senão inicializa com o dia "1"
+    // Tenta pegar o dia atual se for setembro de 2026, senão inicializa com o dia "1"
     const today = new Date();
-    const isAug2026 = today.getMonth() === 7 && today.getFullYear() === 2026;
-    return isAug2026 ? String(today.getDate()) : "1";
+    const isSep2026 = today.getMonth() === 8 && today.getFullYear() === 2026;
+    return isSep2026 ? String(today.getDate()) : "1";
   });
   
   const [selectedCentral, setSelectedCentral] = useState('central-picarras');
@@ -36,7 +36,7 @@ export default function DutyTab() {
           const dateStr = parts[0].trim();
           const dayOfWeek = parts[1].trim();
           
-          // Extrair o número do dia da data "1-ago-26"
+          // Extrair o número do dia da data "1-set-26"
           const dayMatch = dateStr.match(/^(\d+)/);
           if (!dayMatch) continue;
           
@@ -50,10 +50,10 @@ export default function DutyTab() {
               "central-picarras": parts[2].trim(),
               "central-picarras-2": parts[3].trim(),
               "container-picarras": parts[4].trim(),
-              "central-penha": parts[5].trim(),
-              "central-penha-2": parts[6].trim(),
-              "central-penha-coral-1": parts[7].trim(),
-              "central-penha-coral-2": parts[8] ? parts[8].trim() : parts[7].trim()
+              "central-armacao": parts[5].trim(),
+              "central-armacao-2": parts[6].trim(),
+              "central-coral": parts[7].trim(),
+              "central-coral-2": parts[8] ? parts[8].trim() : parts[7].trim()
             }
           });
         }
@@ -61,9 +61,17 @@ export default function DutyTab() {
 
       if (parsedScale.length > 0) {
         const newScaleData = {
-          month: "Importado",
+          month: "Setembro",
           year: "2026",
-          centrals: scaleData.centrals,
+          centrals: [
+            { id: "central-picarras", label: "Central Piçarras" },
+            { id: "central-picarras-2", label: "Central Piçarras 2" },
+            { id: "container-picarras", label: "Container Piçarras" },
+            { id: "central-armacao", label: "Central Armação" },
+            { id: "central-armacao-2", label: "Central Armação 2" },
+            { id: "central-coral", label: "Central Coral" },
+            { id: "central-coral-2", label: "Central Coral 2" }
+          ],
           scale: parsedScale
         };
         setScaleData(newScaleData);

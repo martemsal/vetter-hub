@@ -7,6 +7,7 @@ import {
 import { getStoredDriveIndex } from '../data/driveIndex';
 import { searchDriveWithGeminiIntelligence } from '../utils/geminiDriveEngine';
 import { queryAvailabilityWithContext } from '../utils/availabilityEngine';
+import { queryDutyScale } from '../data/dutyScale';
 
 
 export default function AssistantChat({ driveFiles }) {
@@ -188,7 +189,27 @@ export default function AssistantChat({ driveFiles }) {
         console.warn(err);
       }
 
-      // 2. Fallback: Busca de arquivos no Google Drive
+      // 2. Verificar se a pergunta refere-se à escala de plantão
+      try {
+        const dutyResult = queryDutyScale(query);
+        if (dutyResult.matched) {
+          const assistantMsg = {
+            id: newMsgId,
+            sender: 'assistant',
+            text: dutyResult.text,
+            files: []
+          };
+          setMessages((prev) => [...prev, assistantMsg]);
+          if (wasVoice) {
+            speakText("Aqui está a escala de plantão solicitada.", newMsgId);
+          }
+          return;
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+
+      // 3. Fallback: Busca de arquivos no Google Drive
       const searchResult = searchDriveWithGeminiIntelligence(query, driveFiles);
       if (searchResult.status === 'found' && searchResult.file) {
         const assistantMsg = {
