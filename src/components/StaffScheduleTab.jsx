@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Users, Building, ShieldCheck, CheckCircle2, UserCheck, 
-  ChevronRight, FileSpreadsheet, Edit3, Save, Briefcase, Calendar, Coffee, Clock 
+  ChevronRight, FileSpreadsheet, Edit3, Save, Briefcase, Calendar, 
+  Coffee, Clock, Search, Sparkles, User, MapPin, Plane, Check, X
 } from 'lucide-react';
-import { getStoredStaffSchedule, saveStoredStaffSchedule } from '../data/staffSchedule';
+import { getStoredStaffSchedule } from '../data/staffSchedule';
 
 export default function StaffScheduleTab() {
   const [scheduleData, setScheduleData] = useState(() => getStoredStaffSchedule());
@@ -13,241 +14,130 @@ export default function StaffScheduleTab() {
     return isCurrent ? String(today.getDate()) : "1";
   });
   
-  const [selectedSector, setSelectedSector] = useState(() => {
-    return scheduleData.sectors && scheduleData.sectors.length > 0 ? scheduleData.sectors[0].id : 'todos';
-  });
-  
-  const [isEditing, setIsEditing] = useState(false);
-  const [rawTextImport, setRawTextImport] = useState('');
+  const [selectedSector, setSelectedSector] = useState('todos');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCollaboratorModal, setSelectedCollaboratorModal] = useState(null);
 
-  // Encontra a escala para o dia selecionado
-  const currentDayScale = scheduleData.scale.find(s => s.day === selectedDay) || scheduleData.scale[0] || {
+  const daysList = scheduleData.days || [];
+  const collaborators = scheduleData.collaborators || [];
+
+  // Obter o dia atual selecionado
+  const currentDayInfo = daysList.find(d => d.day === selectedDay) || daysList[0] || {
     day: "1",
     dayOfWeek: "Terça-feira",
-    dateStr: "01/09/2026",
-    shifts: {}
+    dateStr: "01/09/2026"
   };
 
-  const handleDaySelect = (day) => {
-    setSelectedDay(day);
+  // Filtragem dos colaboradores
+  const filteredCollaborators = useMemo(() => {
+    return collaborators.filter(c => {
+      const matchSector = selectedSector === 'todos' || c.sector.toLowerCase() === selectedSector.toLowerCase();
+      const matchSearch = !searchTerm.trim() || 
+        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.sector.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchSector && matchSearch;
+    });
+  }, [collaborators, selectedSector, searchTerm]);
+
+  // Contadores de status para o dia selecionado
+  const stats = useMemo(() => {
+    let working = 0;
+    let off = 0;
+    let plantao = 0;
+    let vacations = 0;
+
+    collaborators.forEach(c => {
+      const status = (c.days[selectedDay] || '').toLowerCase();
+      if (status.includes('trabalhado')) {
+        working++;
+      } else if (status.includes('folga')) {
+        off++;
+      } else if (status.includes('cv') || status.includes('piçarras') || status.includes('coral')) {
+        plantao++;
+      } else if (status.includes('férias') || status.includes('ferias')) {
+        vacations++;
+      }
+    });
+
+    return { working, off, plantao, vacations };
+  }, [collaborators, selectedDay]);
+
+  // Formatação de badge por tipo de status
+  const getStatusBadge = (statusStr) => {
+    const s = (statusStr || '').trim();
+    const lower = s.toLowerCase();
+
+    if (lower.includes('trabalhado')) {
+      return (
+        <span className="status-badge-custom status-working">
+          <Check size={13} />
+          <span>Trabalhando</span>
+        </span>
+      );
+    }
+    if (lower.includes('folga')) {
+      return (
+        <span className="status-badge-custom status-off">
+          <Coffee size={13} />
+          <span>Folga</span>
+        </span>
+      );
+    }
+    if (lower.includes('cv') || lower.includes('piçarras') || lower.includes('coral')) {
+      return (
+        <span className="status-badge-custom status-plantao">
+          <Building size={13} />
+          <span>{s}</span>
+        </span>
+      );
+    }
+    if (lower.includes('férias') || lower.includes('ferias')) {
+      return (
+        <span className="status-badge-custom status-vacation">
+          <Plane size={13} />
+          <span>Férias</span>
+        </span>
+      );
+    }
+    return (
+      <span className="status-badge-custom status-neutral">
+        <span>{s || 'Livre'}</span>
+      </span>
+    );
   };
 
-  // Parser avançado específico para o modelo de cabeçalho da Vetter:
-  // [Folga] \t [Setor] \t [Colaborador] \t [01/09/2026] \t [02/09/2026] ...
-  const handleImportExcelVetter = () => {
-    if (!rawTextImport.trim()) return;
-
-    try {
-      const rawLines = rawTextImport.trim().split('\n');
-      if (rawLines.length < 2) return;
-
-      // Localizar a linha de cabeçalho com as datas
-      let headerRowIndex = -1;
-      for (let i = 0; i < rawLines.length; i++) {
-        if (rawLines[i].includes('Setor') && rawLines[i].includes('Colaborador')) {
-          headerRowIndex = i;
-          break;
-        }
-      }
-
-      if (headerRowIndex === -1) {
-        headerRowIndex = 0;
-      }
-
-      const headerCols = rawLines[headerRowIndex].split('\t');
-      
-      // As datas começam após as colunas Folga (0), Setor (1), Colaborador (2)
-      // Ou seja, a partir do índice 3 (ou 2 se não tiver Folga)
-      let dateStartIndex = 3;
-      if (!headerCols[0].toLowerCase().includes('folga')) {
-        dateStartIndex = 2;
-      }
-
-      const daysList = [];
-      for (let col = dateStartIndex; col < headerCols.length; col++) {
-        const colHeader = headerCols[col].trim();
-        if (!colHeader) continue;
-        
-        // Tenta achar data no formato DD/MM/AAAA ou DD/MM
-        const dateMatch = colHeader.match(/(\d{1,2})\/(\d{1,2})/);
-        const dayNum = dateMatch ? String(parseInt(dateMatch[1], 10)) : String(col - dateStartIndex + 1);
-        
-        daysList.push({
-          colIndex: col,
-          day: dayNum,
-          dateStr: colHeader
-        });
-      }
-
-      // Processar as linhas dos colaboradores
-      const sectorsMap = new Map();
-      const collaborators = [];
-
-      for (let r = headerRowIndex + 1; r < rawLines.length; r++) {
-        const rowCols = rawLines[r].split('\t');
-        if (rowCols.length < 3) continue;
-
-        let folga = "";
-        let sectorName = "";
-        let staffName = "";
-
-        if (dateStartIndex === 3) {
-          folga = rowCols[0] ? rowCols[0].trim() : "";
-          sectorName = rowCols[1] ? rowCols[1].trim() : "Geral";
-          staffName = rowCols[2] ? rowCols[2].trim() : "";
-        } else {
-          sectorName = rowCols[0] ? rowCols[0].trim() : "Geral";
-          staffName = rowCols[1] ? rowCols[1].trim() : "";
-        }
-
-        if (!staffName) continue;
-
-        const sectorId = sectorName.toLowerCase().replace(/[^a-z0-9]/g, '-');
-        if (!sectorsMap.has(sectorId)) {
-          sectorsMap.set(sectorId, { id: sectorId, label: sectorName });
-        }
-
-        const scheduleByDay = {};
-        daysList.forEach(d => {
-          const status = rowCols[d.colIndex] ? rowCols[d.colIndex].trim() : "";
-          scheduleByDay[d.day] = status;
-        });
-
-        collaborators.push({
-          name: staffName,
-          sectorId,
-          sectorName,
-          folga,
-          scheduleByDay
-        });
-      }
-
-      // Reconstruir scale por dia
-      const newScale = daysList.map(d => {
-        const shifts = {};
-        collaborators.forEach(c => {
-          // Se o colaborador trabalha ou tem status nesse dia
-          const dayStatus = c.scheduleByDay[d.day];
-          if (dayStatus) {
-            shifts[c.sectorId] = shifts[c.sectorId] ? `${shifts[c.sectorId]}, ${c.name} (${dayStatus})` : `${c.name} (${dayStatus})`;
-          } else {
-            shifts[c.sectorId] = shifts[c.sectorId] || c.name;
-          }
-        });
-
-        return {
-          day: d.day,
-          dayOfWeek: "Dia",
-          dateStr: d.dateStr,
-          shifts
-        };
-      });
-
-      const sectorsArray = Array.from(sectorsMap.values());
-      if (sectorsArray.length === 0) {
-        sectorsArray.push({ id: "geral", label: "Administrativo & Comercial" });
-      }
-
-      const updatedSchedule = {
-        month: "Setembro",
-        year: "2026",
-        sectors: sectorsArray,
-        scale: newScale.length > 0 ? newScale : scheduleData.scale,
-        collaborators
-      };
-
-      setScheduleData(updatedSchedule);
-      saveStoredStaffSchedule(updatedSchedule);
-      if (sectorsArray.length > 0) {
-        setSelectedSector(sectorsArray[0].id);
-      }
-      setIsEditing(false);
-      setRawTextImport('');
-      alert('Escala importada e organizada com sucesso!');
-    } catch (e) {
-      console.error(e);
-      alert('Erro ao processar as colunas do Excel. Verifique se copiou a tabela completa.');
+  const getSectorColor = (sector) => {
+    switch (sector.toLowerCase()) {
+      case 'administrativo':
+        return '#38bdf8'; // Sky blue
+      case 'comercial':
+        return 'var(--gold-primary)'; // Gold
+      case 'sdr':
+        return '#a855f7'; // Purple
+      default:
+        return '#94a3b8';
     }
   };
-
-  const currentSectorObj = scheduleData.sectors.find(s => s.id === selectedSector) || scheduleData.sectors[0];
-  const assignedStaff = currentDayScale.shifts ? currentDayScale.shifts[selectedSector] : 'Não escalado';
 
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 18, paddingBottom: 40 }}>
       {/* Header da Aba */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <span className="gold-badge">Escala de Trabalho</span>
-          <h2 style={{ fontSize: 22, marginTop: 4 }}>Administrativo & Comercial</h2>
+          <span className="gold-badge">Escala de Trabalho Oficial</span>
+          <h2 style={{ fontSize: 22, marginTop: 4 }}>Administrativo e Comercial</h2>
           <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-            Consulte o setor, colaborador, plantões e folgas.
+            Consulte a escala de Setembro/2026 de toda a equipe Vetter.
           </p>
         </div>
-
-        <button
-          className="header-btn"
-          onClick={() => setIsEditing(!isEditing)}
-          title="Colar planilha do Excel"
-        >
-          <Edit3 size={16} />
-        </button>
       </div>
 
-      {/* Janela de Importação da Planilha */}
-      {isEditing && (
-        <div 
-          style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-gold)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12
-          }}
-        >
-          <h3 style={{ fontSize: 15, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <FileSpreadsheet size={18} color="var(--gold-primary)" />
-            <span>Importar Planilha do Excel</span>
-          </h3>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            Selecione no Excel desde o cabeçalho (<strong>Folga, Setor, Colaborador, Datas...</strong>) até as linhas dos colaboradores, copie (Ctrl+C) e cole abaixo:
-          </p>
-          <textarea
-            placeholder="Cole aqui os dados copiados do Excel (Ctrl+V)..."
-            value={rawTextImport}
-            onChange={(e) => setRawTextImport(e.target.value)}
-            style={{
-              width: '100%',
-              height: 130,
-              background: '#020617',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
-              padding: 8,
-              fontSize: 11,
-              fontFamily: 'monospace',
-              color: 'var(--text-primary)'
-            }}
-          />
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn-primary" onClick={handleImportExcelVetter} style={{ flex: 1 }}>
-              <Save size={14} />
-              <span>Processar & Salvar</span>
-            </button>
-            <button className="btn-secondary" onClick={() => setIsEditing(false)}>
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 1. Box da Data (Carrossel de Dias) */}
+      {/* 1. Box da Data (Carrossel de Dias de Setembro) */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Calendar size={14} />
-            <span>Data da Escala ({scheduleData.month} / {scheduleData.year})</span>
+            <Calendar size={14} color="var(--gold-primary)" />
+            <span>Data Selecionada ({currentDayInfo.dateStr} — {currentDayInfo.dayOfWeek})</span>
           </h4>
         </div>
         
@@ -261,18 +151,18 @@ export default function StaffScheduleTab() {
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          {scheduleData.scale.map((s) => {
-            const isSelected = selectedDay === s.day;
-            const isWeekend = s.dayOfWeek && (s.dayOfWeek.includes('Sábado') || s.dayOfWeek.includes('Domingo'));
+          {daysList.map((d) => {
+            const isSelected = selectedDay === d.day;
+            const isWeekend = d.dayOfWeek && (d.dayOfWeek.toLowerCase().includes('sábado') || d.dayOfWeek.toLowerCase().includes('domingo'));
             
             return (
               <button
-                key={s.day}
-                onClick={() => handleDaySelect(s.day)}
+                key={d.day}
+                onClick={() => setSelectedDay(d.day)}
                 style={{
-                  minWidth: 48,
-                  height: 60,
-                  borderRadius: '10px',
+                  minWidth: 50,
+                  height: 62,
+                  borderRadius: '12px',
                   background: isSelected ? 'var(--gold-primary)' : 'var(--bg-card)',
                   border: isSelected ? '1px solid var(--border-gold)' : '1px solid var(--border-subtle)',
                   color: isSelected ? '#000' : 'var(--text-primary)',
@@ -282,14 +172,15 @@ export default function StaffScheduleTab() {
                   justifyContent: 'center',
                   cursor: 'pointer',
                   flexShrink: 0,
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  boxShadow: isSelected ? '0 4px 12px rgba(212, 160, 23, 0.35)' : 'none'
                 }}
               >
-                <span style={{ fontSize: 9, opacity: isSelected ? 0.8 : 0.6, fontWeight: 700 }}>
-                  {(s.dayOfWeek || 'DIA').substring(0, 3).toUpperCase()}
+                <span style={{ fontSize: 9, opacity: isSelected ? 0.9 : 0.6, fontWeight: 700 }}>
+                  {(d.dayOfWeek || 'DIA').substring(0, 3).toUpperCase()}
                 </span>
-                <span style={{ fontSize: 16, fontWeight: 800, marginTop: 2, color: isWeekend && !isSelected ? 'var(--accent-rose)' : 'inherit' }}>
-                  {s.day}
+                <span style={{ fontSize: 17, fontWeight: 800, marginTop: 2, color: isWeekend && !isSelected ? 'var(--accent-rose)' : 'inherit' }}>
+                  {d.day}
                 </span>
               </button>
             );
@@ -297,14 +188,57 @@ export default function StaffScheduleTab() {
         </div>
       </div>
 
-      {/* 2. Box do Setor (Seletor em Chips) */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Briefcase size={14} />
-          <span>Setor / Área</span>
-        </h4>
+      {/* 2. Box de Estatísticas Rápidas do Dia */}
+      <div 
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 8
+        }}
+      >
+        <div className="stat-pill" style={{ borderColor: 'rgba(34, 197, 94, 0.3)', background: 'rgba(34, 197, 94, 0.08)' }}>
+          <span style={{ fontSize: 18, fontWeight: 800, color: '#4ade80' }}>{stats.working}</span>
+          <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>Trabalhando</span>
+        </div>
+        <div className="stat-pill" style={{ borderColor: 'rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.08)' }}>
+          <span style={{ fontSize: 18, fontWeight: 800, color: '#f87171' }}>{stats.off}</span>
+          <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>Folga</span>
+        </div>
+        <div className="stat-pill" style={{ borderColor: 'rgba(212, 160, 23, 0.3)', background: 'rgba(212, 160, 23, 0.08)' }}>
+          <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--gold-primary)' }}>{stats.plantao}</span>
+          <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>Central Vendas</span>
+        </div>
+      </div>
+
+      {/* 3. Filtros por Setor e Busca por Colaborador */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {/* Barra de Busca de Nome */}
+        <div className="search-input-wrap" style={{ margin: 0 }}>
+          <Search size={16} color="var(--text-muted)" />
+          <input
+            type="text"
+            placeholder="Buscar colaborador (ex: Daniel, Sabrina, Bianca)..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <button 
+              onClick={() => setSearchTerm('')}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+
+        {/* Chips de Setor */}
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-          {scheduleData.sectors.map((sec) => {
+          {[
+            { id: 'todos', label: `Todos (${collaborators.length})` },
+            { id: 'administrativo', label: `Administrativo (5)` },
+            { id: 'comercial', label: `Comercial (7)` },
+            { id: 'sdr', label: `SDR (4)` }
+          ].map((sec) => {
             const isSelected = selectedSector === sec.id;
             return (
               <button
@@ -320,112 +254,226 @@ export default function StaffScheduleTab() {
         </div>
       </div>
 
-      {/* 3. Box do Colaborador (Card Principal de Destaque) */}
-      <div 
-        style={{
-          background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.35) 0%, rgba(15, 23, 42, 0.8) 100%)',
-          border: '1px solid var(--border-gold)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '22px 18px',
-          boxShadow: 'var(--shadow-gold)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-          gap: 12
-        }}
-      >
-        <div 
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: '50%',
-            background: 'var(--gold-subtle)',
-            border: '2px solid var(--border-gold)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--gold-primary)',
-            fontSize: 22,
-            fontWeight: 800
-          }}
-        >
-          {assignedStaff ? assignedStaff.substring(0, 2).toUpperCase() : 'ET'}
-        </div>
-
-        <div>
-          <span className="gold-gradient-text" style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            {currentSectorObj?.label}
-          </span>
-          <h3 style={{ fontSize: 22, fontWeight: 800, marginTop: 4 }}>
-            {assignedStaff || 'Ninguém escalado'}
-          </h3>
-          <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-            {currentDayScale.dateStr} — ({currentDayScale.dayOfWeek})
-          </p>
-        </div>
-
-        <div 
-          style={{
-            marginTop: 4,
-            width: '100%',
-            borderTop: '1px solid var(--border-subtle)',
-            paddingTop: 12,
-            fontSize: 12,
-            color: 'var(--accent-emerald)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6
-          }}
-        >
-          <CheckCircle2 size={14} />
-          <span>Escala Confirmada</span>
-        </div>
-      </div>
-
-      {/* Visão Geral da Escala Completa do Dia */}
+      {/* 4. Lista dos Colaboradores */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-          Todos os Setores neste dia
-        </h4>
-        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+            Equipe ({filteredCollaborators.length})
+          </h4>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+            Toque para ver o mês completo
+          </span>
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {scheduleData.sectors.map((sec) => {
-            const staffName = currentDayScale.shifts ? currentDayScale.shifts[sec.id] : null;
-            const isChosenSector = selectedSector === sec.id;
-            
+          {filteredCollaborators.map((c) => {
+            const todayStatus = c.days[selectedDay] || 'Livre';
+            const sectorColor = getSectorColor(c.sector);
+            const initials = c.name.split(' ')[0].substring(0, 2).toUpperCase();
+
             return (
-              <div 
-                key={sec.id}
-                onClick={() => setSelectedSector(sec.id)}
+              <div
+                key={c.name}
+                onClick={() => setSelectedCollaboratorModal(c)}
                 style={{
                   background: 'var(--bg-card)',
-                  border: isChosenSector ? '1px solid var(--border-gold)' : '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '12px 14px',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '14px 16px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   cursor: 'pointer',
-                  transition: 'all 0.2s'
+                  transition: 'transform 0.15s ease, border-color 0.15s ease',
+                  position: 'relative',
+                  overflow: 'hidden'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Briefcase size={16} color={isChosenSector ? "var(--gold-primary)" : "var(--text-muted)"} />
-                  <span style={{ fontSize: 13, fontWeight: isChosenSector ? 700 : 500 }}>{sec.label}</span>
+                {/* Linha colorida do setor à esquerda */}
+                <div 
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 3,
+                    background: sectorColor
+                  }} 
+                />
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div 
+                    style={{
+                      width: 42,
+                      height: 42,
+                      borderRadius: '50%',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: `1px solid ${sectorColor}66`,
+                      color: sectorColor,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 14,
+                      fontWeight: 800,
+                      flexShrink: 0
+                    }}
+                  >
+                    {initials}
+                  </div>
+
+                  <div>
+                    <h4 style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>
+                      {c.name}
+                    </h4>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
+                      <span style={{ fontSize: 11, color: sectorColor, fontWeight: 600 }}>
+                        {c.sector}
+                      </span>
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                        • {c.totalTrab}d trab / {c.totalFolga}d folga
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: isChosenSector ? 'var(--gold-primary)' : 'var(--text-primary)' }}>
-                    {staffName || 'Livre'}
-                  </span>
-                  <ChevronRight size={14} color="var(--text-muted)" />
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {getStatusBadge(todayStatus)}
+                  <ChevronRight size={16} color="var(--text-muted)" />
                 </div>
               </div>
             );
           })}
         </div>
       </div>
+
+      {/* Modal / Sheet com a Escala Individual Completa do Mês */}
+      {selectedCollaboratorModal && (
+        <div 
+          className="modal-backdrop"
+          onClick={() => setSelectedCollaboratorModal(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center'
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#0B132B',
+              borderTop: '1px solid var(--border-gold)',
+              borderRadius: '24px 24px 0 0',
+              width: '100%',
+              maxWidth: 500,
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              padding: '24px 18px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 16,
+              animation: 'slideUp 0.3s ease'
+            }}
+          >
+            {/* Header do Modal */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div 
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: '50%',
+                    background: 'var(--gold-subtle)',
+                    border: '1px solid var(--border-gold)',
+                    color: 'var(--gold-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 16,
+                    fontWeight: 800
+                  }}
+                >
+                  {selectedCollaboratorModal.name.split(' ')[0].substring(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <span className="gold-gradient-text" style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>
+                    {selectedCollaboratorModal.sector}
+                  </span>
+                  <h3 style={{ fontSize: 18, fontWeight: 800 }}>
+                    {selectedCollaboratorModal.name}
+                  </h3>
+                  <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                    Total do mês: {selectedCollaboratorModal.totalTrab} dias trabalhados • {selectedCollaboratorModal.totalFolga} folgas
+                  </p>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => setSelectedCollaboratorModal(null)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 32,
+                  height: 32,
+                  color: '#fff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Calendário Completo dos 30 Dias do Colaborador */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+              <h4 style={{ fontSize: 12, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                Escala de Setembro/2026 (Dia a Dia)
+              </h4>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {daysList.map((d) => {
+                  const dayStatus = selectedCollaboratorModal.days[d.day] || 'Livre';
+                  const isWeekend = d.dayOfWeek && (d.dayOfWeek.toLowerCase().includes('sábado') || d.dayOfWeek.toLowerCase().includes('domingo'));
+
+                  return (
+                    <div
+                      key={d.day}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid rgba(255, 255, 255, 0.06)',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontSize: 13, fontWeight: 800, minWidth: 24, color: isWeekend ? 'var(--accent-rose)' : 'var(--gold-primary)' }}>
+                          {d.day.padStart(2, '0')}
+                        </span>
+                        <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                          {d.dayOfWeek}
+                        </span>
+                      </div>
+                      <div>
+                        {getStatusBadge(dayStatus)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

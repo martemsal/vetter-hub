@@ -1,188 +1,185 @@
-// Escala Oficial de Trabalho Administrativo e Comercial - Vetter Hub
-// Extraída automaticamente do arquivo oficial 'Escala de Trabalho atualizada v3.xlsx' do Google Drive.
-
-export const OFFICIAL_STAFF_DATA = {
+{
   "month": "Setembro",
   "year": "2026",
   "days": [
     {
       "col": 5,
       "day": "1",
-      "dayOfWeek": "Terça-feira",
+      "dayOfWeek": "terça-feira",
       "dateStr": "01/09/2026"
     },
     {
       "col": 6,
       "day": "2",
-      "dayOfWeek": "Quarta-feira",
+      "dayOfWeek": "quarta-feira",
       "dateStr": "02/09/2026"
     },
     {
       "col": 7,
       "day": "3",
-      "dayOfWeek": "Quinta-feira",
+      "dayOfWeek": "quinta-feira",
       "dateStr": "03/09/2026"
     },
     {
       "col": 8,
       "day": "4",
-      "dayOfWeek": "Sexta-feira",
+      "dayOfWeek": "sexta-feira",
       "dateStr": "04/09/2026"
     },
     {
       "col": 9,
       "day": "5",
-      "dayOfWeek": "Sábado",
+      "dayOfWeek": "sábado",
       "dateStr": "05/09/2026"
     },
     {
       "col": 10,
       "day": "6",
-      "dayOfWeek": "Domingo",
+      "dayOfWeek": "domingo",
       "dateStr": "06/09/2026"
     },
     {
       "col": 11,
       "day": "7",
-      "dayOfWeek": "Segunda-feira",
+      "dayOfWeek": "segunda-feira",
       "dateStr": "07/09/2026"
     },
     {
       "col": 12,
       "day": "8",
-      "dayOfWeek": "Terça-feira",
+      "dayOfWeek": "terça-feira",
       "dateStr": "08/09/2026"
     },
     {
       "col": 13,
       "day": "9",
-      "dayOfWeek": "Quarta-feira",
+      "dayOfWeek": "quarta-feira",
       "dateStr": "09/09/2026"
     },
     {
       "col": 14,
       "day": "10",
-      "dayOfWeek": "Quinta-feira",
+      "dayOfWeek": "quinta-feira",
       "dateStr": "10/09/2026"
     },
     {
       "col": 15,
       "day": "11",
-      "dayOfWeek": "Sexta-feira",
+      "dayOfWeek": "sexta-feira",
       "dateStr": "11/09/2026"
     },
     {
       "col": 16,
       "day": "12",
-      "dayOfWeek": "Sábado",
+      "dayOfWeek": "sábado",
       "dateStr": "12/09/2026"
     },
     {
       "col": 17,
       "day": "13",
-      "dayOfWeek": "Domingo",
+      "dayOfWeek": "domingo",
       "dateStr": "13/09/2026"
     },
     {
       "col": 18,
       "day": "14",
-      "dayOfWeek": "Segunda-feira",
+      "dayOfWeek": "segunda-feira",
       "dateStr": "14/09/2026"
     },
     {
       "col": 19,
       "day": "15",
-      "dayOfWeek": "Terça-feira",
+      "dayOfWeek": "terça-feira",
       "dateStr": "15/09/2026"
     },
     {
       "col": 20,
       "day": "16",
-      "dayOfWeek": "Quarta-feira",
+      "dayOfWeek": "quarta-feira",
       "dateStr": "16/09/2026"
     },
     {
       "col": 21,
       "day": "17",
-      "dayOfWeek": "Quinta-feira",
+      "dayOfWeek": "quinta-feira",
       "dateStr": "17/09/2026"
     },
     {
       "col": 22,
       "day": "18",
-      "dayOfWeek": "Sexta-feira",
+      "dayOfWeek": "sexta-feira",
       "dateStr": "18/09/2026"
     },
     {
       "col": 23,
       "day": "19",
-      "dayOfWeek": "Sábado",
+      "dayOfWeek": "sábado",
       "dateStr": "19/09/2026"
     },
     {
       "col": 24,
       "day": "20",
-      "dayOfWeek": "Domingo",
+      "dayOfWeek": "domingo",
       "dateStr": "20/09/2026"
     },
     {
       "col": 25,
       "day": "21",
-      "dayOfWeek": "Segunda-feira",
+      "dayOfWeek": "segunda-feira",
       "dateStr": "21/09/2026"
     },
     {
       "col": 26,
       "day": "22",
-      "dayOfWeek": "Terça-feira",
+      "dayOfWeek": "terça-feira",
       "dateStr": "22/09/2026"
     },
     {
       "col": 27,
       "day": "23",
-      "dayOfWeek": "Quarta-feira",
+      "dayOfWeek": "quarta-feira",
       "dateStr": "23/09/2026"
     },
     {
       "col": 28,
       "day": "24",
-      "dayOfWeek": "Quinta-feira",
+      "dayOfWeek": "quinta-feira",
       "dateStr": "24/09/2026"
     },
     {
       "col": 29,
       "day": "25",
-      "dayOfWeek": "Sexta-feira",
+      "dayOfWeek": "sexta-feira",
       "dateStr": "25/09/2026"
     },
     {
       "col": 30,
       "day": "26",
-      "dayOfWeek": "Sábado",
+      "dayOfWeek": "sábado",
       "dateStr": "26/09/2026"
     },
     {
       "col": 31,
       "day": "27",
-      "dayOfWeek": "Domingo",
+      "dayOfWeek": "domingo",
       "dateStr": "27/09/2026"
     },
     {
       "col": 32,
       "day": "28",
-      "dayOfWeek": "Segunda-feira",
+      "dayOfWeek": "segunda-feira",
       "dateStr": "28/09/2026"
     },
     {
       "col": 33,
       "day": "29",
-      "dayOfWeek": "Terça-feira",
+      "dayOfWeek": "terça-feira",
       "dateStr": "29/09/2026"
     },
     {
       "col": 34,
       "day": "30",
-      "dayOfWeek": "Quarta-feira",
+      "dayOfWeek": "quarta-feira",
       "dateStr": "30/09/2026"
     }
   ],
@@ -801,29 +798,4 @@ export const OFFICIAL_STAFF_DATA = {
       }
     }
   ]
-};
-
-const STORAGE_KEY = 'vetter_staff_schedule_v3_set26';
-
-export function getStoredStaffSchedule() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed && parsed.collaborators && parsed.collaborators.length > 0) {
-        return parsed;
-      }
-    }
-  } catch (e) {
-    console.warn(e);
-  }
-  return OFFICIAL_STAFF_DATA;
-}
-
-export function saveStoredStaffSchedule(scheduleData) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(scheduleData));
-  } catch (e) {
-    console.warn(e);
-  }
 }
